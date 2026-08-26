@@ -14,10 +14,11 @@ const stateLabels: Record<ScreenState, string> = {
   sealChecking: "密封检测", sealPassed: "检测通过", leakCheck: "漏气排查",
 };
 const leakPages = [
-  "/assets/v3-pro/leak/check-fit.svg",
-  "/assets/v3-pro/leak/check-tubing.svg",
-  "/assets/v3-pro/leak/check-cup.svg",
+  "/assets/v3-pro/leak/step-1.svg",
+  "/assets/v3-pro/leak/step-2.svg",
+  "/assets/v3-pro/leak/step-3.svg",
 ];
+const leakPageLabels = ["Check Tubing", "Check Fit", "Check Cup"];
 
 function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery?: number }) {
   const batteryX = connected ? 204 : 220;
@@ -33,7 +34,7 @@ function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery
 
 function LeakInspectionScreen({ step }: { step: number }) {
   const source = leakPages[Math.min(step, leakPages.length - 1)];
-  return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
+  return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
       <clipPath id={`leak-inner-screen-${step}`}><circle cx="216" cy="216" r="176" /></clipPath>
     </defs>
@@ -327,7 +328,8 @@ export default function DeviceDemo() {
   const standbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clickLock = useRef(false);
   const wheelAccumulator = useRef(0);
-  const lastWheelStepAt = useRef(0);
+  const wheelGestureLocked = useRef(false);
+  const wheelGestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPowered = state !== "off" && state !== "poweringOff";
   const isRunning = pumpStatus === "running";
   const deviceControlsLocked = !isPowered || state === "boot" || state === "leakCheck";
@@ -466,6 +468,9 @@ export default function DeviceDemo() {
   useEffect(() => () => {
     if (modeSwitchTimer.current) clearTimeout(modeSwitchTimer.current);
   }, []);
+  useEffect(() => () => {
+    if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
+  }, []);
 
   const startPowerOn = useCallback(() => {
     if (state !== "off") return;
@@ -476,16 +481,20 @@ export default function DeviceDemo() {
   const handleWheel = useCallback((event: React.WheelEvent) => {
     event.preventDefault();
     if (state === "standby") { wake("home"); return; }
-    const now = performance.now();
-    if (now - lastWheelStepAt.current < 220) return;
+    if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
+    wheelGestureEndTimer.current = setTimeout(() => {
+      wheelGestureLocked.current = false;
+      wheelAccumulator.current = 0;
+    }, 300);
+    if (wheelGestureLocked.current) return;
     const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
     wheelAccumulator.current += gestureDelta;
-    if (Math.abs(wheelAccumulator.current) < 22) return;
+    if (Math.abs(wheelAccumulator.current) < 38) return;
     const direction = wheelAccumulator.current > 0 ? 1 : -1;
     wheelAccumulator.current = 0;
-    lastWheelStepAt.current = now;
+    wheelGestureLocked.current = true;
     if (state === "leakCheck") {
-      setLeakStep((value) => Math.max(0, Math.min(3, value + direction)));
+      setLeakStep((value) => (value + direction + 4) % 4);
       setToast("使用滚轮或触控板切换漏气排查页面");
       return;
     }
