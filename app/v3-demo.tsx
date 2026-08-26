@@ -205,10 +205,10 @@ function PumpScreenSvg({
       </g>}
 
       <g className="pump-svg-values">
-        <text x="154" y="325" textAnchor="middle">L{leftLevel}</text>
-        <image href="/assets/v5/icon/speed.svg" x="194" y="306" width="20" height="20" />
-        <text x="226" y="325" textAnchor="middle">{speedLevel}</text>
-        <text x="278" y="325" textAnchor="middle">R{rightLevel}</text>
+          <text x="154" y="343" textAnchor="middle">L{leftLevel}</text>
+          <image href="/assets/v5/icon/speed.svg" x="194" y="324" width="20" height="20" />
+          <text x="226" y="343" textAnchor="middle">{speedLevel}</text>
+          <text x="278" y="343" textAnchor="middle">R{rightLevel}</text>
       </g>
     </svg>
   );
