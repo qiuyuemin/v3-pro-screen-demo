@@ -485,11 +485,11 @@ export default function DeviceDemo() {
     wheelGestureEndTimer.current = setTimeout(() => {
       wheelGestureLocked.current = false;
       wheelAccumulator.current = 0;
-    }, 300);
+    }, 220);
     if (wheelGestureLocked.current) return;
-    const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+    const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : -event.deltaX;
     wheelAccumulator.current += gestureDelta;
-    if (Math.abs(wheelAccumulator.current) < 38) return;
+    if (Math.abs(wheelAccumulator.current) < 28) return;
     const direction = wheelAccumulator.current > 0 ? 1 : -1;
     wheelAccumulator.current = 0;
     wheelGestureLocked.current = true;
