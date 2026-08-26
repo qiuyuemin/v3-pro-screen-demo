@@ -31,7 +31,7 @@ function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery
   </g>;
 }
 
-function LeakInspectionScreen({ step, connected }: { step: number; connected: boolean }) {
+function LeakInspectionScreen({ step }: { step: number }) {
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   const maskId = `leak-hint-mask-${step}`;
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
@@ -54,7 +54,7 @@ function LeakInspectionScreen({ step, connected }: { step: number; connected: bo
     </defs>
     <rect width="432" height="432" fill="#000" />
     <image href={source} x="0" y="0" width="432" height="432" />
-    <HeaderStatus connected={connected} />
+    <rect x="158" y="48" width="116" height="70" rx="18" fill="#000" />
     <g mask={`url(#${maskId})`}><rect x="40" y="300" width="352" height="112" fill="url(#leak-hint-shine)" /></g>
   </svg>;
 }
@@ -171,7 +171,7 @@ function PumpScreenSvg({
   const displayTitle = modeTitles[mode];
 
   return (
-    <svg className={`pump-screen-svg pump-screen-svg-${state}`} viewBox="0 0 432 432" role="img" aria-label={`${modeTitles[mode]} ${state}`}>
+    <svg className={`pump-screen-svg pump-screen-svg-${state}${leakFinal ? " pump-screen-svg-leak-final" : ""}`} viewBox="0 0 432 432" role="img" aria-label={`${modeTitles[mode]} ${state}`}>
       <defs>
         <clipPath id={`screen-circle-${state}`}><circle cx="216" cy="216" r="176" /></clipPath>
         <linearGradient id="hint-shine-gradient" gradientUnits="userSpaceOnUse" x1="-140" y1="0" x2="0" y2="0">
@@ -190,12 +190,12 @@ function PumpScreenSvg({
 
       {isPumping && <>
         <text className="pump-svg-time" x="216" y="210" textAnchor="middle">{formatTime(seconds)}</text>
-        <g clipPath={`url(#screen-circle-${state})`}>
+        {!isSealStatus && <g clipPath={`url(#screen-circle-${state})`}>
           <g className="pump-curve-track" style={{ "--curve-shift": `${modeCurveWidths[mode]}px` } as React.CSSProperties}>
             <image href={modeCurves[mode]} x="40" y="226" width={modeCurveWidths[mode]} height="56" preserveAspectRatio="none" />
             <image href={modeCurves[mode]} x={40 + modeCurveWidths[mode]} y="226" width={modeCurveWidths[mode]} height="56" preserveAspectRatio="none" />
           </g>
-        </g>
+        </g>}
       </>}
 
       {isPaused && <>
@@ -207,17 +207,16 @@ function PumpScreenSvg({
       </>}
 
       {isSealStatus && <g className="seal-status-hint">
-        <rect x="122" y="270" width="188" height="34" rx="17" fill="#09090A" opacity=".38" />
-        <text x="216" y="294" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className="pump-hint-shine-text" x="216" y="294" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text x="216" y="258" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
+        <text className="pump-hint-shine-text" x="216" y="258" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">
         <LeakStepDots active={3} />
-        <text x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
-        <text x="216" y="294" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press and hold to end pumping</text>
-        <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press to resume</text>
-        <text className="pump-hint-shine-text" x="216" y="294" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press and hold to end pumping</text>
+        <text x="216" y="260" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
+        <text x="216" y="286" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press and hold to end pumping</text>
+        <text className="pump-hint-shine-text" x="216" y="260" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press to resume</text>
+        <text className="pump-hint-shine-text" x="216" y="286" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press and hold to end pumping</text>
       </g>}
 
       <g className="pump-svg-values">
@@ -317,6 +316,7 @@ export default function DeviceDemo() {
   const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
+  const [showLeakControls, setShowLeakControls] = useState(false);
   const [toast, setToast] = useState("长按圆屏 3 秒开机");
   const [holdProgress, setHoldProgress] = useState(0);
   const [transitionProgress, setTransitionProgress] = useState(0);
@@ -369,7 +369,7 @@ export default function DeviceDemo() {
       return () => clearTimeout(timer);
     }
     if (state === "sealPassed") {
-      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 3000);
+      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 5000);
       return () => clearTimeout(timer);
     }
   }, [state]);
@@ -659,7 +659,7 @@ export default function DeviceDemo() {
             {state === "standby" && <StandbyScreen />}
             {state === "menu" && <MenuScreen index={menuIndex} showHint={pumpStatus === "idle"} />}
             {state === "modeSuccess" && <SuccessTimerArea seconds={seconds} status={pumpStatus} />}
-            {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen step={leakStep} connected={bluetoothConnected} />}
+            {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen step={leakStep} />}
             {state === "leakCheck" && leakStep === 3 && <PumpScreenSvg state="paused" mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} leakFinal />}
             {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
             {state === "level" && <div className="dynamic-level">
@@ -696,12 +696,18 @@ export default function DeviceDemo() {
         {showGuide && <div className="guide-content"><h2>Demo 操作指南</h2><div className="guide-grid"><div><b>鼠标</b><p>点按：确认 / 开始暂停</p><p>长按 3 秒：开关机</p><p>滚轮：菜单 / 档位</p><p>双击：预留操作</p></div><div><b>键盘</b><p>Q / W / E：模式</p><p>A / D：左右档位</p><p>S：开始 / 暂停</p></div></div></div>}
       </aside>
 
+      <aside className="leak-demo-panel">
+        <button className="leak-demo-toggle" onClick={() => setShowLeakControls((value) => !value)}>漏气检测</button>
+        {showLeakControls && <div className="leak-demo-options">
+          <button onClick={triggerMildLeak}>轻微漏气</button>
+          <button onClick={triggerSevereLeak}>严重漏气</button>
+        </div>}
+      </aside>
+
       <aside className="debug-panel">
         <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "隐藏调试" : "显示调试"}</button>
         {showDebug && <div className="debug-content">
           <button onClick={reset}>重置</button>
-          <button onClick={triggerMildLeak}>轻微漏气</button>
-          <button onClick={triggerSevereLeak}>严重漏气</button>
           <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
           {(["home", "pumping", "paused", "sealChecking", "sealPassed", "leakCheck", "endingPump", "standby", "finish", "modeSuccess", "off"] as ScreenState[]).map((item) => <button key={item} onClick={() => setState(item)}>{stateLabels[item]}</button>)}
         </div>}
