@@ -33,22 +33,9 @@ function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery
 
 function LeakInspectionScreen({ step }: { step: number }) {
   const source = leakPages[Math.min(step, leakPages.length - 1)];
-  const gradientId = `leak-switch-shine-${step}`;
-  const pathId = `leak-switch-path-${step}`;
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
-    <defs>
-      <path id={pathId} d="M92 360 Q216 438 340 360" />
-      <linearGradient id={gradientId} x1="-5%" y1="0" x2="45%" y2="0">
-        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".25" stopColor="#fff" stopOpacity=".18" /><stop offset=".5" stopColor="#fff" stopOpacity=".58" /><stop offset=".75" stopColor="#fff" stopOpacity=".18" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
-        <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
-      </linearGradient>
-    </defs>
     <rect width="432" height="432" fill="#000" />
     <image href={source} x="0" y="0" width="432" height="432" />
-    <rect x="92" y="368" width="248" height="54" fill="#000" />
-    <text className="leak-switch-base"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
-    <text className="leak-switch-shine" fill={`url(#${gradientId})`}><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
   </svg>;
 }
 
@@ -313,8 +300,7 @@ export default function DeviceDemo() {
   const [leakStep, setLeakStep] = useState(0);
   const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
-  const [showDebug, setShowDebug] = useState(true);
-  const [showLeakControls, setShowLeakControls] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const [toast, setToast] = useState("长按圆屏 3 秒开机");
   const [holdProgress, setHoldProgress] = useState(0);
   const [transitionProgress, setTransitionProgress] = useState(0);
@@ -329,8 +315,11 @@ export default function DeviceDemo() {
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const standbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clickLock = useRef(false);
+  const wheelAccumulator = useRef(0);
+  const lastWheelStepAt = useRef(0);
   const isPowered = state !== "off" && state !== "poweringOff";
   const isRunning = pumpStatus === "running";
+  const deviceControlsLocked = !isPowered || state === "boot" || state === "leakCheck";
   const modeColor = MODE_COLORS[mode];
 
   const resetIdle = useCallback(() => {
@@ -389,7 +378,7 @@ export default function DeviceDemo() {
   }, [previousState, state]);
 
   const showTemporary = useCallback((nextMode: PumpMode) => {
-    if (!isPowered || state === "boot" || state === "endingPump") return;
+    if (!isPowered || state === "boot" || state === "endingPump" || state === "leakCheck") return;
     if (nextMode === mode) return;
     if (state === "standby") { wake(); return; }
     if (modeSwitchTimer.current) clearTimeout(modeSwitchTimer.current);
@@ -403,7 +392,7 @@ export default function DeviceDemo() {
   }, [isPowered, mode, pumpStatus, state, wake]);
 
   const togglePump = useCallback(() => {
-    if (!isPowered || state === "boot" || state === "endingPump") return;
+    if (!isPowered || state === "boot" || state === "endingPump" || state === "leakCheck") return;
     if (state === "standby") { wake("home"); return; }
     if (pumpStatus === "running") {
       setPumpStatus("paused"); setState("paused"); setToast("吸奶已暂停");
@@ -414,11 +403,6 @@ export default function DeviceDemo() {
     }
   }, [isPowered, pumpStatus, seconds, state, wake]);
 
-  const triggerMildLeak = useCallback(() => {
-    if (pumpStatus !== "running") { setToast("请先开始吸奶，再触发轻微漏气"); return; }
-    setToast("检测到轻微漏气，开始静默补偿");
-  }, [pumpStatus]);
-
   const triggerSevereLeak = useCallback(() => {
     if (pumpStatus === "idle") { setToast("请先开始吸奶，再触发严重漏气"); return; }
     setPumpStatus("paused"); setLeakStep(0); setState("leakCheck");
@@ -426,7 +410,7 @@ export default function DeviceDemo() {
   }, [pumpStatus]);
 
   const openLevel = useCallback((side: "left" | "right" | "speed") => {
-    if (!isPowered || state === "boot" || state === "endingPump") return;
+    if (!isPowered || state === "boot" || state === "endingPump" || state === "leakCheck") return;
     if (levelConfirmTimer.current) clearTimeout(levelConfirmTimer.current);
     levelConfirmTimer.current = null;
     if (state !== "level") {
@@ -480,15 +464,25 @@ export default function DeviceDemo() {
 
   const handleWheel = useCallback((event: React.WheelEvent) => {
     event.preventDefault();
-    const direction = event.deltaY > 0 ? 1 : -1;
     if (state === "standby") { wake("home"); return; }
-    if (state === "paused") {
+    wheelAccumulator.current += event.deltaY;
+    if (Math.abs(wheelAccumulator.current) < 70) return;
+    const now = performance.now();
+    if (now - lastWheelStepAt.current < 420) { wheelAccumulator.current = 0; return; }
+    const direction = wheelAccumulator.current > 0 ? 1 : -1;
+    wheelAccumulator.current = 0;
+    lastWheelStepAt.current = now;
+    if (state === "leakCheck") {
+      setLeakStep((value) => Math.max(0, Math.min(3, value + direction)));
+      setToast("使用滚轮或触控板切换漏气排查页面");
+      return;
+    }
+    if (state === "paused" || state === "home" || state === "pumping") {
       const currentIndex = MENU_ITEMS.findIndex((item) => item.mode === mode);
-      setMenuIndex(currentIndex >= 0 ? currentIndex : 0);
+      setMenuIndex(((currentIndex >= 0 ? currentIndex : 0) + direction + MENU_ITEMS.length) % MENU_ITEMS.length);
       setState("menu");
       return;
     }
-    if (state === "home" || state === "pumping") { setState("menu"); setMenuIndex(direction > 0 ? 0 : MENU_ITEMS.length - 1); return; }
     if (state === "menu") { setMenuIndex((value) => (value + direction + MENU_ITEMS.length) % MENU_ITEMS.length); return; }
     if (state === "level") {
       const update = (value: number) => Math.min(V3_CONFIG.maxLevel, Math.max(V3_CONFIG.minLevel, value + direction));
@@ -507,7 +501,7 @@ export default function DeviceDemo() {
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
     if (state === "leakCheck") {
-      if (leakStep < 3) { setLeakStep((value) => value + 1); setToast(leakStep === 2 ? "请选择恢复吸奶或长按结束吸奶" : "切换到下一项漏气排查"); }
+      if (leakStep < 3) { setToast("请使用鼠标滚轮或触控板切换漏气排查页面"); }
       else { setPumpStatus("running"); setState("pumping"); setToast("漏气排查完成，继续吸奶"); }
       return;
     }
@@ -636,6 +630,17 @@ export default function DeviceDemo() {
     setLeakStep(0); setBluetoothConnected(false);
   };
 
+  const jumpToDemoState = (target: "home" | "pumping" | "paused" | "sealChecking" | "leakCheck" | "standby" | "off") => {
+    if (target === "home") { setPumpStatus("idle"); setSeconds(0); }
+    if (target === "pumping" || target === "sealChecking") setPumpStatus("running");
+    if (target === "paused" || target === "leakCheck") setPumpStatus("paused");
+    if (target === "leakCheck") setLeakStep(0);
+    if (target === "standby") setPreviousState(pumpStatus === "running" ? "pumping" : pumpStatus === "paused" ? "paused" : "home");
+    if (target === "off") { setPumpStatus("idle"); setSeconds(0); }
+    setState(target);
+    setToast(stateLabels[target]);
+  };
+
   return (
     <main className="demo-shell" onPointerMove={resetIdle}>
       <header className="topbar">
@@ -679,11 +684,11 @@ export default function DeviceDemo() {
           </div>
 
           <div className="device-controls" aria-label="设备实体按键">
-            {MODES.map((item) => <button key={item.id} onClick={() => showTemporary(item.id)} disabled={!isPowered || state === "boot"} aria-label={item.label}><img className="button-art" src={`/assets/v5/device-buttons/${item.id === "stimulation" ? "Stimulate" : "Expression"}.svg`} alt={item.label} /></button>)}
-            <button onClick={() => openLevel("speed")} disabled={!isPowered || state === "boot"} aria-label="Speed"><img className="button-art" src="/assets/v5/device-buttons/Speed.svg" alt="Speed" /></button>
-            <button onClick={() => openLevel("left")} disabled={!isPowered || state === "boot"} aria-label="Left"><img className="button-art" src="/assets/v5/device-buttons/Left.svg" alt="Left" /></button>
-            <button onClick={togglePump} disabled={!isPowered || state === "boot"} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
-            <button onClick={() => openLevel("right")} disabled={!isPowered || state === "boot"} aria-label="Right"><img className="button-art" src="/assets/v5/device-buttons/Right.svg" alt="Right" /></button>
+            {MODES.map((item) => <button key={item.id} onClick={() => showTemporary(item.id)} disabled={deviceControlsLocked} aria-label={item.label}><img className="button-art" src={`/assets/v5/device-buttons/${item.id === "stimulation" ? "Stimulate" : "Expression"}.svg`} alt={item.label} /></button>)}
+            <button onClick={() => openLevel("speed")} disabled={deviceControlsLocked} aria-label="Speed"><img className="button-art" src="/assets/v5/device-buttons/Speed.svg" alt="Speed" /></button>
+            <button onClick={() => openLevel("left")} disabled={deviceControlsLocked} aria-label="Left"><img className="button-art" src="/assets/v5/device-buttons/Left.svg" alt="Left" /></button>
+            <button onClick={togglePump} disabled={deviceControlsLocked} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
+            <button onClick={() => openLevel("right")} disabled={deviceControlsLocked} aria-label="Right"><img className="button-art" src="/assets/v5/device-buttons/Right.svg" alt="Right" /></button>
           </div>
         </div>
         <div className="status-toast"><span className={isPowered ? "dot on" : "dot"} />{toast}</div>
@@ -695,19 +700,21 @@ export default function DeviceDemo() {
       </aside>
 
       <aside className="leak-demo-panel">
-        <button className="leak-demo-toggle" onClick={() => setShowLeakControls((value) => !value)}>漏气检测</button>
-        {showLeakControls && <div className="leak-demo-options">
-          <button onClick={triggerMildLeak}>轻微漏气</button>
-          <button onClick={triggerSevereLeak}>严重漏气</button>
-        </div>}
+        <button className="leak-demo-toggle" onClick={triggerSevereLeak}>严重漏气</button>
       </aside>
 
       <aside className="debug-panel">
-        <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "隐藏调试" : "显示调试"}</button>
+        <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "收起演示状态" : "演示状态"}</button>
         {showDebug && <div className="debug-content">
-          <button onClick={reset}>重置</button>
-          <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
-          {(["home", "pumping", "paused", "sealChecking", "sealPassed", "leakCheck", "endingPump", "standby", "finish", "modeSuccess", "off"] as ScreenState[]).map((item) => <button key={item} onClick={() => setState(item)}>{stateLabels[item]}</button>)}
+          {([
+            ["主页", "home"],
+            ["吸奶中", "pumping"],
+            ["暂停", "paused"],
+            ["初步漏气检测", "sealChecking"],
+            ["严重漏气", "leakCheck"],
+            ["待机", "standby"],
+            ["关机", "off"],
+          ] as const).map(([label, target]) => <button key={target} onClick={() => jumpToDemoState(target)}>{label}</button>)}
         </div>}
       </aside>
     </main>

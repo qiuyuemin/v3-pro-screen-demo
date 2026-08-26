@@ -3,7 +3,7 @@ export const V3_CONFIG = {
   longPressActivationMs: 450,
   finishHoldMs: 3000,
   powerOffHoldMs: 3000,
-  bootDurationMs: 1500,
+  bootDurationMs: 2000,
   feedbackDurationMs: 900,
   standbyAfterMs: 3 * 60 * 1000,
   powerOffAfterMs: 10 * 60 * 1000,
