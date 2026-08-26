@@ -412,7 +412,7 @@ export default function DeviceDemo() {
   }, [isPowered, pumpStatus, seconds, state, wake]);
 
   const triggerSevereLeak = useCallback(() => {
-    if (pumpStatus === "idle") { setToast("请先开始吸奶，再触发严重漏气"); return; }
+    if (pumpStatus !== "running") { setToast("严重漏气检测仅可在吸奶中触发"); return; }
     setPumpStatus("paused"); setLeakStep(0); setState("leakCheck");
     setToast("检测到严重漏气，吸奶已暂停");
   }, [pumpStatus]);
@@ -663,10 +663,11 @@ export default function DeviceDemo() {
   };
 
   const jumpToLeakStep = (step: number) => {
+    if (pumpStatus === "idle") setSeconds(0);
     setPumpStatus("paused");
     setLeakStep(Math.max(0, Math.min(3, step)));
     setState("leakCheck");
-    setToast(`严重漏气 ${step + 1}`);
+    setToast(`吸奶计时会话已建立 · 严重漏气 ${step + 1}`);
   };
 
   return (
@@ -734,8 +735,8 @@ export default function DeviceDemo() {
       <aside className="debug-panel">
         <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "收起演示状态" : "演示状态"}</button>
         {showDebug && <div className="debug-content">
-          {[0, 1, 2, 3].map((step) => <button key={`leak-debug-${step}`} onClick={() => jumpToLeakStep(step)}>严重漏气{step + 1}</button>)}
           <button onClick={() => jumpToDemoState("sealChecking")}>启动自检</button>
+          {[0, 1, 2, 3].map((step) => <button key={`leak-debug-${step}`} onClick={() => jumpToLeakStep(step)}>严重漏气{step + 1}</button>)}
           <button onClick={() => jumpToDemoState("home")}>主页</button>
           <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
         </div>}
