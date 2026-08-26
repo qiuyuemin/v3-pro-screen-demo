@@ -46,8 +46,6 @@ function LeakInspectionScreen({ step }: { step: number }) {
     </defs>
     <rect width="432" height="432" fill="#000" />
     <image href={source} x="0" y="0" width="432" height="432" />
-    <rect x="184" y="68" width="25" height="29" rx="6" fill="#000" />
-    <rect x="216" y="70" width="31" height="23" rx="6" fill="#000" />
     <rect x="92" y="368" width="248" height="54" fill="#000" />
     <text className="leak-switch-base"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
     <text className="leak-switch-shine" fill={`url(#${gradientId})`}><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
