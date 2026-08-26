@@ -37,17 +37,17 @@ function LeakInspectionScreen({ step }: { step: number }) {
   const pathId = `leak-switch-path-${step}`;
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
     <defs>
-      <path id={pathId} d="M104 340 Q216 405 328 340" />
-      <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="230" y2="0">
-        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".42" stopColor="#fff" stopOpacity=".16" /><stop offset=".52" stopColor="#fff" stopOpacity=".6" /><stop offset=".62" stopColor="#fff" stopOpacity=".16" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
-        <animate attributeName="x1" values="100;360" dur="2.6s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="230;490" dur="2.6s" repeatCount="indefinite" />
+      <path id={pathId} d="M92 360 Q216 438 340 360" />
+      <linearGradient id={gradientId} x1="0%" y1="0" x2="35%" y2="0">
+        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".4" stopColor="#fff" stopOpacity=".16" /><stop offset=".52" stopColor="#fff" stopOpacity=".64" /><stop offset=".64" stopColor="#fff" stopOpacity=".16" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
+        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <rect width="432" height="432" fill="#000" />
     <image href={source} x="0" y="0" width="432" height="432" />
     <rect x="158" y="48" width="116" height="70" rx="18" fill="#000" />
-    <rect x="82" y="336" width="268" height="74" fill="#000" />
+    <rect x="68" y="334" width="296" height="92" fill="#000" />
     <text className="leak-switch-base"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
     <text className="leak-switch-shine" fill={`url(#${gradientId})`}><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
   </svg>;
@@ -115,10 +115,10 @@ function MenuScreen({ index, showHint }: { index: number; showHint: boolean }) {
     <defs>
       <clipPath id="menu-icon-clip"><rect x="120" y="105" width="192" height="124" /></clipPath>
       <path id="menu-hint-path" d="M98.62 333.38 A166 166 0 0 0 333.38 333.38" />
-      <linearGradient id="menu-hint-shine-gradient" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="230" y2="0">
-        <stop stopColor="white" stopOpacity="0" /><stop offset=".42" stopColor="white" stopOpacity=".14" /><stop offset=".52" stopColor="white" stopOpacity=".58" /><stop offset=".62" stopColor="white" stopOpacity=".14" /><stop offset="1" stopColor="white" stopOpacity="0" />
-        <animate attributeName="x1" values="100;360" dur="2.8s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="230;490" dur="2.8s" repeatCount="indefinite" />
+      <linearGradient id="menu-hint-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
+        <stop stopColor="white" stopOpacity="0" /><stop offset=".4" stopColor="white" stopOpacity=".16" /><stop offset=".52" stopColor="white" stopOpacity=".64" /><stop offset=".64" stopColor="white" stopOpacity=".16" /><stop offset="1" stopColor="white" stopOpacity="0" />
+        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <rect width="432" height="432" fill="#000" />
@@ -168,10 +168,15 @@ function PumpScreenSvg({
     <svg className={`pump-screen-svg pump-screen-svg-${state}${leakFinal ? " pump-screen-svg-leak-final" : ""}`} viewBox="0 0 432 432" role="img" aria-label={`${modeTitles[mode]} ${state}`}>
       <defs>
         <clipPath id={`screen-circle-${state}`}><circle cx="216" cy="216" r="176" /></clipPath>
-        <linearGradient id="hint-shine-gradient" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="230" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".42" stopColor={modeShineColors[mode]} stopOpacity=".14" /><stop offset=".52" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".62" stopColor={modeShineColors[mode]} stopOpacity=".14" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="100;360" dur="2.8s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="230;490" dur="2.8s" repeatCount="indefinite" />
+        <linearGradient id="hint-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".4" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset=".52" stopColor={modeShineColors[mode]} stopOpacity=".64" /><stop offset=".64" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
+        </linearGradient>
+        <linearGradient id="final-line-one-shine" x1="-35%" y1="0" x2="-5%" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".4" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset=".52" stopColor={modeShineColors[mode]} stopOpacity=".64" /><stop offset=".64" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="0%;65%" begin="1.4s" dur="2.8s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="35%;100%" begin="1.4s" dur="2.8s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
 
@@ -209,7 +214,7 @@ function PumpScreenSvg({
         <LeakStepDots active={3} />
         <text x="216" y="260" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
         <text x="216" y="286" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press and hold to end pumping</text>
-        <text className="pump-hint-shine-text" x="216" y="260" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press to resume</text>
+        <text className="pump-hint-shine-text" x="216" y="260" textAnchor="middle" style={{ fill: "url(#final-line-one-shine)" }}>Press to resume</text>
         <text className="pump-hint-shine-text" x="216" y="286" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press and hold to end pumping</text>
       </g>}
 
@@ -229,10 +234,10 @@ function StandbyScreen() {
       <linearGradient id="standby-text-cleanup" x1="0" y1="116" x2="0" y2="154" gradientUnits="userSpaceOnUse">
         <stop stopColor="#0F0507" /><stop offset="1" stopColor="#160609" />
       </linearGradient>
-      <linearGradient id="standby-shine-gradient" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="230" y2="0">
-        <stop stopColor="#FFF7FA" stopOpacity="0" /><stop offset=".42" stopColor="#FFF7FA" stopOpacity=".14" /><stop offset=".52" stopColor="#FFF7FA" stopOpacity=".58" /><stop offset=".62" stopColor="#FFF7FA" stopOpacity=".14" /><stop offset="1" stopColor="#FFF7FA" stopOpacity="0" />
-        <animate attributeName="x1" values="100;360" dur="2.8s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="230;490" dur="2.8s" repeatCount="indefinite" />
+      <linearGradient id="standby-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
+        <stop stopColor="#FFF7FA" stopOpacity="0" /><stop offset=".4" stopColor="#FFF7FA" stopOpacity=".16" /><stop offset=".52" stopColor="#FFF7FA" stopOpacity=".64" /><stop offset=".64" stopColor="#FFF7FA" stopOpacity=".16" /><stop offset="1" stopColor="#FFF7FA" stopOpacity="0" />
+        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <image href="/assets/screen/待机页.png" x="0" y="0" width="432" height="432" />
@@ -653,9 +658,9 @@ export default function DeviceDemo() {
             {state === "standby" && <StandbyScreen />}
             {state === "menu" && <MenuScreen index={menuIndex} showHint={pumpStatus === "idle"} />}
             {state === "modeSuccess" && <SuccessTimerArea seconds={seconds} status={pumpStatus} />}
-            {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen step={leakStep} />}
-            {state === "leakCheck" && leakStep === 3 && <PumpScreenSvg state="paused" mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} leakFinal />}
-            {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
+            {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen key={`leak-step-${leakStep}`} step={leakStep} />}
+            {state === "leakCheck" && leakStep === 3 && <PumpScreenSvg key={`leak-final-${mode}`} state="paused" mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} leakFinal />}
+            {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg key={`pump-${state}-${mode}`} state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
             {state === "level" && <div className="dynamic-level">
               {activeControl === "speed"
                 ? <SpeedProgress level={speedLevel} color={modeColor} />
