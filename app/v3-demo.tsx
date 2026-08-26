@@ -480,7 +480,7 @@ export default function DeviceDemo() {
     wheelGestureEndTimer.current = setTimeout(() => {
       wheelGestureLocked.current = false;
       wheelAccumulator.current = 0;
-    }, 220);
+    }, state === "level" ? 220 : 520);
     if (wheelGestureLocked.current) return;
     const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : -event.deltaX;
     wheelAccumulator.current += gestureDelta;
@@ -489,7 +489,7 @@ export default function DeviceDemo() {
     wheelAccumulator.current = 0;
     wheelGestureLocked.current = true;
     if (state === "leakCheck") {
-      setLeakStep((value) => (value + direction + 4) % 4);
+      setLeakStep((value) => Math.max(0, Math.min(3, value + direction)));
       setToast("使用滚轮或触控板切换漏气排查页面");
       return;
     }
@@ -657,6 +657,13 @@ export default function DeviceDemo() {
     setToast(stateLabels[target]);
   };
 
+  const jumpToLeakStep = (step: number) => {
+    setPumpStatus("paused");
+    setLeakStep(Math.max(0, Math.min(3, step)));
+    setState("leakCheck");
+    setToast(`严重漏气 ${step + 1}`);
+  };
+
   return (
     <main className="demo-shell" onPointerMove={resetIdle}>
       <header className="topbar">
@@ -722,18 +729,10 @@ export default function DeviceDemo() {
       <aside className="debug-panel">
         <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "收起演示状态" : "演示状态"}</button>
         {showDebug && <div className="debug-content">
-          {([
-            ["主页", "home"],
-            ["吸奶中", "pumping"],
-            ["暂停", "paused"],
-          ] as const).map(([label, target]) => <button key={target} onClick={() => jumpToDemoState(target)}>{label}</button>)}
+          <button onClick={() => jumpToDemoState("home")}>主页</button>
           <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
-          {([
-            ["初步漏气检测", "sealChecking"],
-            ["严重漏气", "leakCheck"],
-            ["待机", "standby"],
-            ["关机", "off"],
-          ] as const).map(([label, target]) => <button key={target} onClick={() => jumpToDemoState(target)}>{label}</button>)}
+          <button onClick={() => jumpToDemoState("sealChecking")}>初步漏气检测</button>
+          {[0, 1, 2, 3].map((step) => <button key={`leak-debug-${step}`} onClick={() => jumpToLeakStep(step)}>严重漏气{step + 1}</button>)}
         </div>}
       </aside>
     </main>
