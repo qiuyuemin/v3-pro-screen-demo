@@ -1,5 +1,5 @@
 export const V3_CONFIG = {
-  longPressMs: 3000,
+  longPressMs: 2000,
   longPressActivationMs: 450,
   finishHoldMs: 3000,
   powerOffHoldMs: 3000,

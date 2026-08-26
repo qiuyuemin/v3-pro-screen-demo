@@ -301,7 +301,7 @@ export default function DeviceDemo() {
   const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
   const [showDebug, setShowDebug] = useState(false);
-  const [toast, setToast] = useState("长按圆屏 3 秒开机");
+  const [toast, setToast] = useState("长按圆屏 2 秒开机");
   const [holdProgress, setHoldProgress] = useState(0);
   const [transitionProgress, setTransitionProgress] = useState(0);
   const [transitionKind, setTransitionKind] = useState<"finish" | "poweroff" | null>(null);
@@ -465,10 +465,11 @@ export default function DeviceDemo() {
   const handleWheel = useCallback((event: React.WheelEvent) => {
     event.preventDefault();
     if (state === "standby") { wake("home"); return; }
-    wheelAccumulator.current += event.deltaY;
-    if (Math.abs(wheelAccumulator.current) < 70) return;
     const now = performance.now();
-    if (now - lastWheelStepAt.current < 420) { wheelAccumulator.current = 0; return; }
+    if (now - lastWheelStepAt.current < 220) return;
+    const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+    wheelAccumulator.current += gestureDelta;
+    if (Math.abs(wheelAccumulator.current) < 22) return;
     const direction = wheelAccumulator.current > 0 ? 1 : -1;
     wheelAccumulator.current = 0;
     lastWheelStepAt.current = now;
@@ -496,7 +497,7 @@ export default function DeviceDemo() {
 
   const handleScreenClick = useCallback(() => {
     if (clickLock.current) return;
-    if (state === "off") { setToast("请长按圆屏 3 秒开机"); return; }
+    if (state === "off") { setToast("请长按圆屏 2 秒开机"); return; }
     if (state === "boot") return;
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
@@ -550,7 +551,7 @@ export default function DeviceDemo() {
           setPumpStatus("idle");
           setState("off");
           setSeconds(0);
-          setToast("长按圆屏 3 秒开机");
+          setToast("长按圆屏 2 秒开机");
         }
       }
     }, 40);
@@ -626,7 +627,7 @@ export default function DeviceDemo() {
     if (modeSwitchTimer.current) clearTimeout(modeSwitchTimer.current);
     modeSwitchTimer.current = null;
     stopHold(); clearTransition(); setState("off"); setMode(V3_CONFIG.defaultMode); setLeftLevel(V3_CONFIG.defaultLevel);
-    setRightLevel(V3_CONFIG.defaultLevel); setSpeedLevel(V3_CONFIG.defaultSpeed); setSeconds(0); setPumpStatus("idle"); setMenuIndex(0); setToast("长按圆屏 3 秒开机");
+    setRightLevel(V3_CONFIG.defaultLevel); setSpeedLevel(V3_CONFIG.defaultSpeed); setSeconds(0); setPumpStatus("idle"); setMenuIndex(0); setToast("长按圆屏 2 秒开机");
     setLeakStep(0); setBluetoothConnected(false);
   };
 
@@ -651,10 +652,10 @@ export default function DeviceDemo() {
         </div>
       </header>
 
-      <section className="workspace">
+      <section className="workspace" onWheel={handleWheel}>
         <div className="device-wrap">
           <img className="device-image" src="/assets/device/整机UI-不包含按键.png" alt="V3 吸奶器主机" draggable={false} />
-          <div className={`round-screen state-${state}`} style={{ "--mode-color": modeColor } as React.CSSProperties} onWheel={handleWheel} onClick={handleScreenClick}
+          <div className={`round-screen state-${state}`} style={{ "--mode-color": modeColor } as React.CSSProperties} onClick={handleScreenClick}
             onDoubleClick={() => setToast("双击动作已保留，当前未绑定功能")} onPointerDown={beginHold}
             onPointerUp={stopHold} onPointerCancel={stopHold} onPointerLeave={stopHold} onContextMenu={(e) => e.preventDefault()}
             role="button" tabIndex={0} aria-label="圆屏主按钮操作区域">
@@ -696,7 +697,7 @@ export default function DeviceDemo() {
 
       <aside className="guide-panel">
         <button className="panel-toggle" onClick={() => setShowGuide(!showGuide)}>{showGuide ? "收起操作指南" : "展开操作指南"}</button>
-        {showGuide && <div className="guide-content"><h2>Demo 操作指南</h2><div className="guide-grid"><div><b>鼠标</b><p>点按：确认 / 开始暂停</p><p>长按 3 秒：开关机</p><p>滚轮：菜单 / 档位</p><p>双击：预留操作</p></div><div><b>键盘</b><p>Q / W / E：模式</p><p>A / D：左右档位</p><p>S：开始 / 暂停</p></div></div></div>}
+        {showGuide && <div className="guide-content"><h2>Demo 操作指南</h2><div className="guide-grid"><div><b>鼠标 / 触控板</b><p>点按：确认 / 开始暂停</p><p>长按 2 秒：开机</p><p>长按 3 秒：结束 / 关机</p><p>双指滚动：圆钮选择</p></div><div><b>键盘</b><p>Q / W / E：模式</p><p>A / D：左右档位</p><p>S：开始 / 暂停</p></div></div></div>}
       </aside>
 
       <aside className="leak-demo-panel">
@@ -710,6 +711,9 @@ export default function DeviceDemo() {
             ["主页", "home"],
             ["吸奶中", "pumping"],
             ["暂停", "paused"],
+          ] as const).map(([label, target]) => <button key={target} onClick={() => jumpToDemoState(target)}>{label}</button>)}
+          <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
+          {([
             ["初步漏气检测", "sealChecking"],
             ["严重漏气", "leakCheck"],
             ["待机", "standby"],
