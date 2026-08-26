@@ -76,13 +76,13 @@ const modeCurves: Record<PumpMode, string> = {
   cozyFlow: "/assets/v5/icon/曲线program.svg",
   customized: "/assets/v5/icon/曲线program.svg",
 };
-const modeCurveWidths: Record<PumpMode, number> = {
-  stimulation: 355,
-  expression: 354,
-  powerPumping: 354,
-  milkBoost: 354,
-  cozyFlow: 354,
-  customized: 354,
+const modeAnimatedCurves: Record<PumpMode, string> = {
+  stimulation: "/assets/v3-pro/curves/stimulation.webp",
+  expression: "/assets/v3-pro/curves/expression.webp",
+  powerPumping: "/assets/v3-pro/curves/program-dots.webp",
+  milkBoost: "/assets/v3-pro/curves/program-dots.webp",
+  cozyFlow: "/assets/v3-pro/curves/program-dots.webp",
+  customized: "/assets/v3-pro/curves/program-dots.webp",
 };
 const modeHintColors: Record<PumpMode, string> = {
   stimulation: "#B98F9A",
@@ -187,12 +187,7 @@ function PumpScreenSvg({
 
       {isPumping && <>
         <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
-        {!isSealStatus && <g clipPath={`url(#screen-circle-${state})`}>
-          <g className="pump-curve-track" style={{ "--curve-shift": `${modeCurveWidths[mode]}px` } as React.CSSProperties}>
-            <image href={modeCurves[mode]} x="40" y="226" width={modeCurveWidths[mode]} height="56" preserveAspectRatio="none" />
-            <image href={modeCurves[mode]} x={40 + modeCurveWidths[mode]} y="226" width={modeCurveWidths[mode]} height="56" preserveAspectRatio="none" />
-          </g>
-        </g>}
+        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="184" width="360" height="108" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
       {isPaused && <>

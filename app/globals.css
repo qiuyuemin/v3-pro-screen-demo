@@ -54,8 +54,6 @@ button { font:inherit; }
 .pro-header-status { pointer-events:none; }
 .standby-base-text,.standby-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:18px; font-weight:400; letter-spacing:-.2px; }
 .standby-base-text { fill:#A39A9D; }
-.pump-curve-track { animation:curveTrackLeft 6.4s linear infinite; }
-@keyframes curveTrackLeft { from { transform:translateX(0); } to { transform:translateX(calc(-1 * var(--curve-shift))); } }
 .pause-curve-svg { transform-box:fill-box; transform-origin:center; }
 .pump-screen { position:absolute; inset:0; overflow:hidden; color:#fff; background:#000; }
 .pump-orb { position:absolute; inset:9.26%; border-radius:50%; background:center/cover no-repeat; }
