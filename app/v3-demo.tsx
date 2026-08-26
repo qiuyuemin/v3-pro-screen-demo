@@ -324,8 +324,7 @@ export default function DeviceDemo() {
   const clickLock = useRef(false);
   const wheelAccumulator = useRef(0);
   const wheelGestureLocked = useRef(false);
-  const lastWheelEventAt = useRef(0);
-  const lastWheelMagnitude = useRef(0);
+  const wheelGestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPowered = state !== "off" && state !== "poweringOff";
   const isRunning = pumpStatus === "running";
   const deviceControlsLocked = !isPowered || state === "boot" || state === "leakCheck";
@@ -467,7 +466,10 @@ export default function DeviceDemo() {
   useEffect(() => {
     const keepDemoFixed = (event: WheelEvent) => event.preventDefault();
     window.addEventListener("wheel", keepDemoFixed, { passive: false });
-    return () => window.removeEventListener("wheel", keepDemoFixed);
+    return () => {
+      window.removeEventListener("wheel", keepDemoFixed);
+      if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
+    };
   }, []);
 
   const startPowerOn = useCallback(() => {
@@ -480,16 +482,11 @@ export default function DeviceDemo() {
     event.preventDefault();
     if (state === "standby") { wake("home"); return; }
     const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : -event.deltaX;
-    const magnitude = Math.abs(gestureDelta);
-    const now = performance.now();
-    const eventGap = now - lastWheelEventAt.current;
-    const startsNewGesture = wheelGestureLocked.current && (eventGap > 140 || (magnitude >= 10 && magnitude > lastWheelMagnitude.current * 1.75));
-    if (startsNewGesture) {
+    if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
+    wheelGestureEndTimer.current = setTimeout(() => {
       wheelGestureLocked.current = false;
       wheelAccumulator.current = 0;
-    }
-    lastWheelEventAt.current = now;
-    lastWheelMagnitude.current = magnitude;
+    }, 380);
     if (wheelGestureLocked.current) return;
     wheelAccumulator.current += gestureDelta;
     if (Math.abs(wheelAccumulator.current) < (state === "level" ? 18 : 22)) return;
