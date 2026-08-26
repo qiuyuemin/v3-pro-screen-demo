@@ -181,11 +181,11 @@ function PumpScreenSvg({
       <image href={background} x="40" y="40" width="352" height="352" preserveAspectRatio="xMidYMid slice" clipPath={`url(#screen-circle-${state})`} />
       <HeaderStatus connected={bluetoothConnected} />
       <text className="pump-svg-title" x="216" y="124" textAnchor="middle">{displayTitle}</text>
-      {((isPaused && !leakFinal) || state === "home") && <text className="pump-svg-hint" x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{hint}</text>}
-      {((isPaused && !leakFinal) || state === "home") && <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{hint}</text>}
+      {((isPaused && !leakFinal) || state === "home") && <text className="pump-svg-hint" x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{hint}</text>}
+      {((isPaused && !leakFinal) || state === "home") && <text className="pump-hint-shine-text" x="216" y="261" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{hint}</text>}
 
       {isPumping && <>
-        <text className="pump-svg-time" x="216" y="210" textAnchor="middle">{formatTime(seconds)}</text>
+        <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
         {!isSealStatus && <g clipPath={`url(#screen-circle-${state})`}>
           <g className="pump-curve-track" style={{ "--curve-shift": `${modeCurveWidths[mode]}px` } as React.CSSProperties}>
             <image href={modeCurves[mode]} x="40" y="226" width={modeCurveWidths[mode]} height="56" preserveAspectRatio="none" />
@@ -199,12 +199,12 @@ function PumpScreenSvg({
         <image href="/assets/v5/pump/暂停页暂停UI.svg" x="187" y="172" width="58" height="62" />
       </>}
       {state === "home" && <>
-        <text className="pump-svg-time" x="216" y="210" textAnchor="middle">{formatTime(seconds)}</text>
+        <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
       </>}
 
       {isSealStatus && <g className="seal-status-hint">
-        <text x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="270" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
+        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">
@@ -216,10 +216,10 @@ function PumpScreenSvg({
       </g>}
 
       <g className="pump-svg-values">
-          <text x="154" y="343" textAnchor="middle">L{leftLevel}</text>
-          <image href="/assets/v5/icon/speed.svg" x="194" y="324" width="20" height="20" />
-          <text x="226" y="343" textAnchor="middle">{speedLevel}</text>
-          <text x="278" y="343" textAnchor="middle">R{rightLevel}</text>
+          <text x="154" y="327" textAnchor="middle">L{leftLevel}</text>
+          <image href="/assets/v5/icon/speed.svg" x="194" y="308" width="20" height="20" />
+          <text x="226" y="327" textAnchor="middle">{speedLevel}</text>
+          <text x="278" y="327" textAnchor="middle">R{rightLevel}</text>
       </g>
     </svg>
   );
