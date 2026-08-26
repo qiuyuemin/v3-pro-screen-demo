@@ -162,7 +162,7 @@ function PumpScreenSvg({
   const isPaused = state === "paused" || leakFinal;
   const isPumping = state === "pumping" || isSealStatus;
   const hint = isPaused ? "Press to resume" : "Press to start pumping";
-  const sealHint = state === "sealChecking" ? "Checking seal..." : state === "sealPassed" ? "Seal check passed..." : "";
+  const sealHint = state === "sealChecking" ? "Checking seal..." : state === "sealPassed" ? "Seal check passed" : "";
   const displayTitle = modeTitles[mode];
 
   return (
@@ -369,7 +369,7 @@ export default function DeviceDemo() {
       return () => clearTimeout(timer);
     }
     if (state === "sealPassed") {
-      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 5000);
+      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 2000);
       return () => clearTimeout(timer);
     }
   }, [state]);
