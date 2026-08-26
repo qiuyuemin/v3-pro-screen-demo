@@ -34,13 +34,19 @@ function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery
 function LeakInspectionScreen({ step }: { step: number }) {
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
-    <rect width="432" height="432" fill="#000" />
-    <image href={source} x="0" y="0" width="432" height="432" />
+    <defs>
+      <clipPath id={`leak-inner-screen-${step}`}><circle cx="216" cy="216" r="176" /></clipPath>
+    </defs>
+    <circle cx="216" cy="216" r="216" fill="#000" />
+    <circle cx="216" cy="216" r="176" fill="#000" />
+    <image href={source} x="0" y="0" width="432" height="432" clipPath={`url(#leak-inner-screen-${step})`} />
+    <path d="M152 40H280V66H152Z" fill="#000" clipPath={`url(#leak-inner-screen-${step})`} />
+    <LeakStepDots active={step} />
   </svg>;
 }
 
 function LeakStepDots({ active }: { active: number }) {
-  const positions = [[180, 36], [204, 32], [228, 32], [252, 36]];
+  const positions = [[183, 49], [205, 46], [227, 46], [249, 49]];
   return <g className="leak-step-dots" aria-label={`漏气排查第 ${active + 1} 步`}>
     {positions.map(([cx, cy], index) => <circle key={index} cx={cx} cy={cy} r="5.4" className={index === active ? "active" : ""} />)}
   </g>;
