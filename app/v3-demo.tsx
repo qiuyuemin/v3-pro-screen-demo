@@ -11,7 +11,60 @@ const fixedImages: Partial<Record<ScreenState, string>> = {
 const stateLabels: Record<ScreenState, string> = {
   off: "关机", boot: "启动", home: "主页", menu: "菜单", pumping: "吸奶中", paused: "暂停",
   level: "档位", endingPump: "结束中", standby: "待机", finish: "反馈", modeSuccess: "切换成功", poweringOff: "关机中",
+  sealChecking: "密封检测", sealPassed: "检测通过", leakCheck: "漏气排查",
 };
+const leakPages = [
+  "/assets/v3-pro/leak/check-fit.svg",
+  "/assets/v3-pro/leak/check-tubing.svg",
+  "/assets/v3-pro/leak/check-cup.svg",
+];
+
+function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery?: number }) {
+  const batteryX = connected ? 204 : 220;
+  return <g className="pro-header-status" aria-label={`电量 ${battery}%${connected ? "，蓝牙已连接" : "，蓝牙未连接"}`}>
+    {!connected && <image href="/assets/v5/icon/BluetoothNotConnected.svg" x="188" y="72" width="20" height="20" opacity=".82" />}
+    <g transform={`translate(${batteryX} 76)`}>
+      <rect x="0" y="0" width="20" height="11" rx="2" fill="none" stroke="#fff" strokeWidth="1.6" opacity=".86" />
+      <rect x="20.8" y="3" width="2.2" height="5" rx="1" fill="#fff" opacity=".86" />
+      <rect x="2.5" y="2.5" width={15 * battery / 100} height="6" rx="1" fill="#fff" opacity=".86" />
+    </g>
+  </g>;
+}
+
+function LeakInspectionScreen({ step, connected }: { step: number; connected: boolean }) {
+  const source = leakPages[Math.min(step, leakPages.length - 1)];
+  const maskId = `leak-hint-mask-${step}`;
+  return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
+    <defs>
+      <linearGradient id="leak-hint-shine" gradientUnits="userSpaceOnUse" x1="-140" y1="0" x2="0" y2="0">
+        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".5" stopColor="#fff" stopOpacity=".38" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
+        <animate attributeName="x1" values="-140;432" dur="2.8s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="0;572" dur="2.8s" repeatCount="indefinite" />
+      </linearGradient>
+      <>
+        <filter id="leak-hint-threshold" x="0" y="0" width="432" height="432" colorInterpolationFilters="sRGB">
+          <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .333 .333 .333 0 0" />
+          <feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 0 1 1 1 1" /></feComponentTransfer>
+        </filter>
+        <mask id={maskId} maskUnits="userSpaceOnUse" x="40" y="300" width="352" height="112">
+          <rect x="40" y="300" width="352" height="112" fill="#000" />
+          <image href={source} x="0" y="0" width="432" height="432" filter="url(#leak-hint-threshold)" />
+        </mask>
+      </>
+    </defs>
+    <rect width="432" height="432" fill="#000" />
+    <image href={source} x="0" y="0" width="432" height="432" />
+    <HeaderStatus connected={connected} />
+    <g mask={`url(#${maskId})`}><rect x="40" y="300" width="352" height="112" fill="url(#leak-hint-shine)" /></g>
+  </svg>;
+}
+
+function LeakStepDots({ active }: { active: number }) {
+  const positions = [[180, 36], [204, 32], [228, 32], [252, 36]];
+  return <g className="leak-step-dots" aria-label={`漏气排查第 ${active + 1} 步`}>
+    {positions.map(([cx, cy], index) => <circle key={index} cx={cx} cy={cy} r="5.4" className={index === active ? "active" : ""} />)}
+  </g>;
+}
 const modeTitles: Record<PumpMode, string> = {
   stimulation: "Stimulation",
   expression: "Expression",
@@ -97,17 +150,24 @@ function PumpScreenSvg({
   leftLevel,
   rightLevel,
   speedLevel,
+  bluetoothConnected,
+  leakFinal = false,
 }: {
-  state: "home" | "pumping" | "paused";
+  state: "home" | "pumping" | "paused" | "sealChecking" | "sealPassed";
   mode: PumpMode;
   seconds: number;
   leftLevel: number;
   rightLevel: number;
   speedLevel: number;
+  bluetoothConnected: boolean;
+  leakFinal?: boolean;
 }) {
   const background = modeBackgrounds[mode];
-  const isPaused = state === "paused";
+  const isSealStatus = state === "sealChecking" || state === "sealPassed";
+  const isPaused = state === "paused" || leakFinal;
+  const isPumping = state === "pumping" || isSealStatus;
   const hint = isPaused ? "Press to resume" : "Press to start pumping";
+  const sealHint = state === "sealChecking" ? "Checking seal..." : state === "sealPassed" ? "Seal check passed..." : "";
   const displayTitle = modeTitles[mode];
 
   return (
@@ -123,12 +183,12 @@ function PumpScreenSvg({
 
       <rect width="432" height="432" fill="#000" />
       <image href={background} x="40" y="40" width="352" height="352" preserveAspectRatio="xMidYMid slice" clipPath={`url(#screen-circle-${state})`} />
-      <image href="/assets/v5/icon/BluetoothNotConnected.svg" x="205" y="71" width="22" height="22" opacity=".8" />
+      <HeaderStatus connected={bluetoothConnected} />
       <text className="pump-svg-title" x="216" y="124" textAnchor="middle">{displayTitle}</text>
-      {(isPaused || state === "home") && <text className="pump-svg-hint" x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{hint}</text>}
-      {(isPaused || state === "home") && <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{hint}</text>}
+      {((isPaused && !leakFinal) || state === "home") && <text className="pump-svg-hint" x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{hint}</text>}
+      {((isPaused && !leakFinal) || state === "home") && <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{hint}</text>}
 
-      {state === "pumping" && <>
+      {isPumping && <>
         <text className="pump-svg-time" x="216" y="210" textAnchor="middle">{formatTime(seconds)}</text>
         <g clipPath={`url(#screen-circle-${state})`}>
           <g className="pump-curve-track" style={{ "--curve-shift": `${modeCurveWidths[mode]}px` } as React.CSSProperties}>
@@ -145,6 +205,20 @@ function PumpScreenSvg({
       {state === "home" && <>
         <text className="pump-svg-time" x="216" y="210" textAnchor="middle">{formatTime(seconds)}</text>
       </>}
+
+      {isSealStatus && <g className="seal-status-hint">
+        <rect x="122" y="270" width="188" height="34" rx="17" fill="#09090A" opacity=".38" />
+        <text x="216" y="294" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
+        <text className="pump-hint-shine-text" x="216" y="294" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
+      </g>}
+
+      {leakFinal && <g className="leak-final-overlay">
+        <LeakStepDots active={3} />
+        <text x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
+        <text x="216" y="294" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press and hold to end pumping</text>
+        <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press to resume</text>
+        <text className="pump-hint-shine-text" x="216" y="294" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press and hold to end pumping</text>
+      </g>}
 
       <g className="pump-svg-values">
         <text x="154" y="325" textAnchor="middle">L{leftLevel}</text>
@@ -239,6 +313,8 @@ export default function DeviceDemo() {
   const [menuIndex, setMenuIndex] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [pumpStatus, setPumpStatus] = useState<"idle" | "running" | "paused">("idle");
+  const [leakStep, setLeakStep] = useState(0);
+  const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
   const [showDebug, setShowDebug] = useState(true);
   const [toast, setToast] = useState("长按圆屏 3 秒开机");
@@ -288,6 +364,17 @@ export default function DeviceDemo() {
   }, [isRunning]);
 
   useEffect(() => {
+    if (state === "sealChecking") {
+      const timer = setTimeout(() => { setState("sealPassed"); setToast("Seal check passed"); }, 5000);
+      return () => clearTimeout(timer);
+    }
+    if (state === "sealPassed") {
+      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
+
+  useEffect(() => {
     if (state !== "menu" || pumpStatus !== "running") return;
     const timer = setTimeout(() => {
       setState("pumping");
@@ -322,10 +409,23 @@ export default function DeviceDemo() {
     if (state === "standby") { wake("home"); return; }
     if (pumpStatus === "running") {
       setPumpStatus("paused"); setState("paused"); setToast("吸奶已暂停");
+    } else if (pumpStatus === "paused") {
+      setPumpStatus("running"); setState("pumping"); setToast("继续吸奶");
     } else {
-      setPumpStatus("running"); setState("pumping"); setToast(seconds ? "继续吸奶" : "开始吸奶");
+      setPumpStatus("running"); setState("sealChecking"); setToast("Checking seal...");
     }
   }, [isPowered, pumpStatus, seconds, state, wake]);
+
+  const triggerMildLeak = useCallback(() => {
+    if (pumpStatus !== "running") { setToast("请先开始吸奶，再触发轻微漏气"); return; }
+    setToast("检测到轻微漏气，开始静默补偿");
+  }, [pumpStatus]);
+
+  const triggerSevereLeak = useCallback(() => {
+    if (pumpStatus === "idle") { setToast("请先开始吸奶，再触发严重漏气"); return; }
+    setPumpStatus("paused"); setLeakStep(0); setState("leakCheck");
+    setToast("检测到严重漏气，吸奶已暂停");
+  }, [pumpStatus]);
 
   const openLevel = useCallback((side: "left" | "right" | "speed") => {
     if (!isPowered || state === "boot" || state === "endingPump") return;
@@ -408,6 +508,12 @@ export default function DeviceDemo() {
     if (state === "boot") return;
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
+    if (state === "leakCheck") {
+      if (leakStep < 3) { setLeakStep((value) => value + 1); setToast(leakStep === 2 ? "请选择恢复吸奶或长按结束吸奶" : "切换到下一项漏气排查"); }
+      else { setPumpStatus("running"); setState("pumping"); setToast("漏气排查完成，继续吸奶"); }
+      return;
+    }
+    if (state === "sealChecking" || state === "sealPassed") { togglePump(); return; }
     if (state === "menu") {
       const selectedMode = MENU_ITEMS[menuIndex].mode;
       if (selectedMode === mode) {
@@ -419,7 +525,7 @@ export default function DeviceDemo() {
     }
     if (state === "finish" || state === "modeSuccess" || state === "endingPump" || state === "poweringOff") return;
     togglePump();
-  }, [confirmLevel, menuIndex, mode, pumpStatus, showTemporary, state, togglePump, wake]);
+  }, [confirmLevel, leakStep, menuIndex, mode, pumpStatus, showTemporary, state, togglePump, wake]);
 
   const clearTransition = useCallback(() => {
     if (transitionTimer.current) clearInterval(transitionTimer.current);
@@ -474,7 +580,7 @@ export default function DeviceDemo() {
   }, [clearTransition, transitionKind]);
 
   const beginHold = useCallback(() => {
-    if (!(["off", "home", "paused", "pumping", "menu", "level"] as ScreenState[]).includes(state)) return;
+    if (!(["off", "home", "paused", "pumping", "menu", "level", "sealChecking", "sealPassed", "leakCheck"] as ScreenState[]).includes(state)) return;
     clickLock.current = false;
     if (state !== "off") {
       holdStart.current = Date.now();
@@ -515,7 +621,7 @@ export default function DeviceDemo() {
   }, [openLevel, showTemporary, togglePump]);
 
   const screenImage = useMemo(() => {
-    if (state === "home" || state === "pumping" || state === "paused" || state === "level" || state === "endingPump" || state === "poweringOff") return undefined;
+    if (state === "home" || state === "pumping" || state === "paused" || state === "level" || state === "endingPump" || state === "poweringOff" || state === "sealChecking" || state === "sealPassed" || state === "leakCheck") return undefined;
     if (state === "menu") return undefined;
     return fixedImages[state];
   }, [menuIndex, mode, state]);
@@ -529,12 +635,13 @@ export default function DeviceDemo() {
     modeSwitchTimer.current = null;
     stopHold(); clearTransition(); setState("off"); setMode(V3_CONFIG.defaultMode); setLeftLevel(V3_CONFIG.defaultLevel);
     setRightLevel(V3_CONFIG.defaultLevel); setSpeedLevel(V3_CONFIG.defaultSpeed); setSeconds(0); setPumpStatus("idle"); setMenuIndex(0); setToast("长按圆屏 3 秒开机");
+    setLeakStep(0); setBluetoothConnected(false);
   };
 
   return (
     <main className="demo-shell" onPointerMove={resetIdle}>
       <header className="topbar">
-        <div className="brand-block"><span className="eyebrow">MOMCOZY · V3</span><h1>整机交互 Demo</h1></div>
+        <div className="brand-block"><span className="eyebrow">MOMCOZY · V3 PRO</span><h1>整机交互 Demo</h1></div>
         <div className="solution-switch" aria-label="交互方案">
           <button className={solution === 1 ? "active" : ""} onClick={() => setSolution(1)}>方案一</button>
           <button className={solution === 2 ? "active" : ""} onClick={() => { setSolution(2); setToast("方案二接口已预留，等待交互素材"); }}>方案二 <small>待接入</small></button>
@@ -552,7 +659,9 @@ export default function DeviceDemo() {
             {state === "standby" && <StandbyScreen />}
             {state === "menu" && <MenuScreen index={menuIndex} showHint={pumpStatus === "idle"} />}
             {state === "modeSuccess" && <SuccessTimerArea seconds={seconds} status={pumpStatus} />}
-            {(state === "home" || state === "pumping" || state === "paused") && <PumpScreenSvg state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} />}
+            {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen step={leakStep} connected={bluetoothConnected} />}
+            {state === "leakCheck" && leakStep === 3 && <PumpScreenSvg state="paused" mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} leakFinal />}
+            {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
             {state === "level" && <div className="dynamic-level">
               {activeControl === "speed"
                 ? <SpeedProgress level={speedLevel} color={modeColor} />
@@ -589,7 +698,13 @@ export default function DeviceDemo() {
 
       <aside className="debug-panel">
         <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "隐藏调试" : "显示调试"}</button>
-        {showDebug && <div className="debug-content"><button onClick={reset}>重置</button>{(["home", "pumping", "paused", "endingPump", "standby", "finish", "modeSuccess", "off"] as ScreenState[]).map((item) => <button key={item} onClick={() => setState(item)}>{stateLabels[item]}</button>)}</div>}
+        {showDebug && <div className="debug-content">
+          <button onClick={reset}>重置</button>
+          <button onClick={triggerMildLeak}>轻微漏气</button>
+          <button onClick={triggerSevereLeak}>严重漏气</button>
+          <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
+          {(["home", "pumping", "paused", "sealChecking", "sealPassed", "leakCheck", "endingPump", "standby", "finish", "modeSuccess", "off"] as ScreenState[]).map((item) => <button key={item} onClick={() => setState(item)}>{stateLabels[item]}</button>)}
+        </div>}
       </aside>
     </main>
   );

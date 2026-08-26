@@ -1,0 +1,13 @@
+<svg width="432" height="432" viewBox="0 0 432 432" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shine" x1="146" y1="0" x2="286" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0"/><stop offset=".5" stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="textMask" maskUnits="userSpaceOnUse" x="135" y="246" width="162" height="34">
+      <rect x="135" y="246" width="162" height="34" fill="black"/>
+      <text x="216" y="271" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" font-weight="600">Press to resume</text>
+    </mask>
+  </defs>
+  <path transform="translate(187 172)" d="M36.2612 9.72099C42.3718 13.2068 47.1735 15.9461 50.5943 18.4553C54.0384 20.9818 56.5859 23.6224 57.4982 27.1041C58.1673 29.657 58.1673 32.3429 57.4982 34.8958C56.5859 38.3775 54.0384 41.0179 50.5943 43.5445C47.1735 46.0538 42.3718 48.793 36.2616 52.2789C30.3591 55.646 25.3815 58.4856 21.6029 60.0998C17.794 61.7265 14.3215 62.5513 10.9465 61.5908C8.46621 60.8848 6.20941 59.5452 4.39139 57.7033C1.92407 55.2038 0.933651 51.7487 0.465086 47.591C-7.42155e-05 43.4633 -3.67481e-05 38.0604 6.71217e-07 31.1882V30.8117C-3.67481e-05 23.9395 -7.42155e-05 18.5365 0.465086 14.409C0.933651 10.2512 1.92407 6.79616 4.39139 4.29642C6.20941 2.45455 8.46621 1.11495 10.9465 0.409169C14.3215 -0.551183 17.794 0.273372 21.6029 1.90024C25.3815 3.51414 30.3591 6.35363 36.2612 9.72099Z" fill="white"/>
+  <rect x="146" y="240" width="140" height="45" fill="url(#shine)" mask="url(#textMask)"/>
+</svg>
