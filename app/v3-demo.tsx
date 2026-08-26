@@ -324,7 +324,8 @@ export default function DeviceDemo() {
   const clickLock = useRef(false);
   const wheelAccumulator = useRef(0);
   const wheelGestureLocked = useRef(false);
-  const wheelGestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastWheelEventAt = useRef(0);
+  const lastWheelMagnitude = useRef(0);
   const isPowered = state !== "off" && state !== "poweringOff";
   const isRunning = pumpStatus === "running";
   const deviceControlsLocked = !isPowered || state === "boot" || state === "leakCheck";
@@ -463,8 +464,10 @@ export default function DeviceDemo() {
   useEffect(() => () => {
     if (modeSwitchTimer.current) clearTimeout(modeSwitchTimer.current);
   }, []);
-  useEffect(() => () => {
-    if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
+  useEffect(() => {
+    const keepDemoFixed = (event: WheelEvent) => event.preventDefault();
+    window.addEventListener("wheel", keepDemoFixed, { passive: false });
+    return () => window.removeEventListener("wheel", keepDemoFixed);
   }, []);
 
   const startPowerOn = useCallback(() => {
@@ -476,15 +479,20 @@ export default function DeviceDemo() {
   const handleWheel = useCallback((event: React.WheelEvent) => {
     event.preventDefault();
     if (state === "standby") { wake("home"); return; }
-    if (wheelGestureEndTimer.current) clearTimeout(wheelGestureEndTimer.current);
-    wheelGestureEndTimer.current = setTimeout(() => {
+    const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : -event.deltaX;
+    const magnitude = Math.abs(gestureDelta);
+    const now = performance.now();
+    const eventGap = now - lastWheelEventAt.current;
+    const startsNewGesture = wheelGestureLocked.current && (eventGap > 140 || (magnitude >= 10 && magnitude > lastWheelMagnitude.current * 1.75));
+    if (startsNewGesture) {
       wheelGestureLocked.current = false;
       wheelAccumulator.current = 0;
-    }, state === "level" ? 220 : 520);
+    }
+    lastWheelEventAt.current = now;
+    lastWheelMagnitude.current = magnitude;
     if (wheelGestureLocked.current) return;
-    const gestureDelta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : -event.deltaX;
     wheelAccumulator.current += gestureDelta;
-    if (Math.abs(wheelAccumulator.current) < 28) return;
+    if (Math.abs(wheelAccumulator.current) < (state === "level" ? 18 : 22)) return;
     const direction = wheelAccumulator.current > 0 ? 1 : -1;
     wheelAccumulator.current = 0;
     wheelGestureLocked.current = true;
@@ -729,10 +737,10 @@ export default function DeviceDemo() {
       <aside className="debug-panel">
         <button className="debug-toggle" onClick={() => setShowDebug(!showDebug)}>{showDebug ? "收起演示状态" : "演示状态"}</button>
         {showDebug && <div className="debug-content">
+          {[0, 1, 2, 3].map((step) => <button key={`leak-debug-${step}`} onClick={() => jumpToLeakStep(step)}>严重漏气{step + 1}</button>)}
+          <button onClick={() => jumpToDemoState("sealChecking")}>启动自检</button>
           <button onClick={() => jumpToDemoState("home")}>主页</button>
           <button onClick={() => { setBluetoothConnected((value) => !value); setToast(bluetoothConnected ? "蓝牙已断开" : "蓝牙已连接"); }}>{bluetoothConnected ? "断开蓝牙" : "连接蓝牙"}</button>
-          <button onClick={() => jumpToDemoState("sealChecking")}>初步漏气检测</button>
-          {[0, 1, 2, 3].map((step) => <button key={`leak-debug-${step}`} onClick={() => jumpToLeakStep(step)}>严重漏气{step + 1}</button>)}
         </div>}
       </aside>
     </main>
