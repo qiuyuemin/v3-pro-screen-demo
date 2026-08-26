@@ -165,6 +165,11 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
+        <linearGradient id="seal-passed-shine-gradient" x1="-20%" y1="0" x2="38%" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".24" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".62" /><stop offset=".76" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="-20%;115%" dur="1.45s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="38%;173%" dur="1.45s" repeatCount="indefinite" />
+        </linearGradient>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
           <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
@@ -199,7 +204,7 @@ function PumpScreenSvg({
 
       {isSealStatus && <g className="seal-status-hint">
         <text x="216" y="270" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className="pump-hint-shine-text" x="216" y="270" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="270" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">

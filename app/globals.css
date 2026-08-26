@@ -36,22 +36,23 @@ button { font:inherit; }
 .round-screen > img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
 .pump-screen-svg { position:absolute; inset:0; display:block; width:100%; height:100%; overflow:hidden; background:#000; }
 .pump-screen-svg text { fill:#fff; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; }
-.pump-svg-title { font-size:26px; font-weight:650; letter-spacing:-.35px; }
-.pump-svg-time { font-size:69px; font-weight:700; letter-spacing:-2.8px; font-variant-numeric:tabular-nums; }
-.pump-svg-hint { font-size:19px; font-weight:500; letter-spacing:-.25px; }
-.pump-hint-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:500; letter-spacing:-.25px; }
-.seal-status-hint text,.leak-final-overlay text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:500; letter-spacing:-.25px; }
+.pump-svg-title { font-size:26px; font-weight:400; letter-spacing:-.35px; }
+.pump-svg-time { font-size:69px; font-weight:700; letter-spacing:-.6px; font-variant-numeric:tabular-nums; }
+.pump-svg-hint { font-size:19px; font-weight:400; letter-spacing:-.25px; }
+.pump-hint-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.25px; }
+.seal-status-hint text,.leak-final-overlay text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.25px; }
 .leak-step-dots circle { fill:#4d4d4d; }
 .leak-step-dots circle.active { fill:#fff; }
-.pump-svg-values text { font-size:26px; font-weight:650; font-variant-numeric:tabular-nums; }
+.pump-svg-values text { font-size:26px; font-weight:400; font-variant-numeric:tabular-nums; }
 .standby-text-shine { position:absolute; z-index:3; inset:0; width:100%; height:100%; pointer-events:none; }
 .leak-workflow-screen { position:absolute; z-index:3; inset:0; display:block; width:100%; height:100%; overflow:hidden; background:#000; }
-.leak-switch-base,.leak-switch-shine { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:500; letter-spacing:-.2px; }
+.leak-switch-base,.leak-switch-shine { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.2px; }
 .leak-switch-base { fill:#929292; }
 .leak-switch-shine,.menu-hint-shine-text,.standby-shine-text,.pump-screen-svg:not(.pump-screen-svg-leak-final) .pump-hint-shine-text { animation:shineEnvelope 3.6s linear infinite; }
+.pump-screen-svg .seal-passed-shine-text { animation:none; }
 @keyframes shineEnvelope { 0%,68% { opacity:1; } 76%,84% { opacity:0; } 100% { opacity:1; } }
 .pro-header-status { pointer-events:none; }
-.standby-base-text,.standby-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:18px; font-weight:500; letter-spacing:-.2px; }
+.standby-base-text,.standby-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:18px; font-weight:400; letter-spacing:-.2px; }
 .standby-base-text { fill:#A39A9D; }
 .pump-curve-track { animation:curveTrackLeft 6.4s linear infinite; }
 @keyframes curveTrackLeft { from { transform:translateX(0); } to { transform:translateX(calc(-1 * var(--curve-shift))); } }
@@ -59,13 +60,13 @@ button { font:inherit; }
 .pump-screen { position:absolute; inset:0; overflow:hidden; color:#fff; background:#000; }
 .pump-orb { position:absolute; inset:9.26%; border-radius:50%; background:center/cover no-repeat; }
 .bluetooth-status { position:absolute; z-index:2; top:15.8%; left:47.2%; width:5.55%; height:5.55%; opacity:.8; }
-.pump-screen h2 { position:absolute; z-index:2; top:24.2%; left:10%; right:10%; margin:0; text-align:center; font-size:clamp(11px,1.45vw,19px); line-height:1; font-weight:650; }
+.pump-screen h2 { position:absolute; z-index:2; top:24.2%; left:10%; right:10%; margin:0; text-align:center; font-size:clamp(11px,1.45vw,19px); line-height:1; font-weight:400; }
 .pump-time { position:absolute; z-index:2; top:37%; left:8%; right:8%; text-align:center; font-size:clamp(31px,4.55vw,62px); line-height:1; font-weight:650; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
-.start-hint,.resume-hint { position:absolute; z-index:2; left:10%; right:10%; margin:0; color:#ffffff80; text-align:center; font-size:clamp(7px,.92vw,13px); font-weight:500; }
+.start-hint,.resume-hint { position:absolute; z-index:2; left:10%; right:10%; margin:0; color:#ffffff80; text-align:center; font-size:clamp(7px,.92vw,13px); font-weight:400; }
 .start-hint { top:57.1%; overflow:hidden; }
 .start-hint::after { content:""; position:absolute; inset:-60% -35%; background:linear-gradient(100deg,transparent 36%,#fff9 50%,transparent 64%); transform:translateX(-70%); animation:hintSweep 2.4s ease-in-out infinite; }
 @keyframes hintSweep { 55%,100% { transform:translateX(70%); } }
-.pump-values { position:absolute; z-index:2; left:27.5%; right:27.5%; bottom:23.5%; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; text-align:center; font-size:clamp(10px,1.35vw,18px); font-weight:600; white-space:nowrap; }
+.pump-values { position:absolute; z-index:2; left:27.5%; right:27.5%; bottom:23.5%; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; text-align:center; font-size:clamp(10px,1.35vw,18px); font-weight:400; white-space:nowrap; }
 .pump-values span { display:flex; align-items:center; justify-content:center; gap:3px; }
 .pump-values img { width:1.1em; height:1.1em; filter:brightness(0) invert(1); }
 .running-curve,.pause-curve { position:absolute; z-index:1; left:9.1%; right:9.1%; top:51.5%; height:13%; overflow:hidden; }
@@ -86,8 +87,8 @@ button { font:inherit; }
 .dynamic-level { position:absolute; inset:0; color:#fff; background:#000; }
 .speed-progress-svg,.arc-progress-svg { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
 .level-arc { --level-progress:0deg; position:absolute; inset:9.5%; border-radius:50%; transform:rotate(220deg); background:conic-gradient(var(--mode-color) var(--level-progress),#292929 0 280deg,transparent 280deg); mask:radial-gradient(circle,transparent 72%,#000 73% 77%,transparent 78%); }
-.dynamic-level strong { position:absolute; top:43.2%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:clamp(34px,5.15vw,70px); line-height:.88; font-weight:700; }
-.dynamic-level>span { position:absolute; top:55.8%; left:0; right:0; color:#999; text-align:center; font-size:clamp(10px,1.4vw,19px); line-height:1; font-weight:600; }
+.dynamic-level strong { position:absolute; top:43.2%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:clamp(34px,5.15vw,70px); line-height:.88; font-weight:400; }
+.dynamic-level>span { position:absolute; top:55.8%; left:0; right:0; color:#999; text-align:center; font-size:clamp(10px,1.4vw,19px); line-height:1; font-weight:400; }
 .level-time { position:absolute; left:27%; right:27%; bottom:10.2%; display:flex; align-items:center; justify-content:center; gap:8%; padding:4.2% 4%; border-radius:999px; background:#272727; font-size:clamp(10px,1.55vw,21px); font-weight:700; font-variant-numeric:tabular-nums; }
 .level-time i { color:var(--mode-color); font-style:normal; font-size:.8em; }
 .mini-timer { position:absolute; z-index:5; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
@@ -96,17 +97,17 @@ button { font:inherit; }
 .menu-screen-svg { position:absolute; inset:0; display:block; width:100%; height:100%; }
 .menu-dots circle { fill:#555; }
 .menu-dots circle.active { fill:#fff; }
-.menu-screen-title { fill:#fff; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:30px; font-weight:600; }
-.menu-screen-estimate { fill:#929292; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:22px; font-weight:500; }
-.menu-screen-hint { fill:#8f8f8f; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:500; letter-spacing:-.2px; }
-.menu-hint-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:500; letter-spacing:-.2px; }
+.menu-screen-title { fill:#fff; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:30px; font-weight:400; }
+.menu-screen-estimate { fill:#929292; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:22px; font-weight:400; }
+.menu-screen-hint { fill:#8f8f8f; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.2px; }
+.menu-hint-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.2px; }
 .success-time { position:absolute; z-index:3; left:29%; right:29%; bottom:10.2%; display:flex; align-items:center; justify-content:center; gap:8%; padding:4.2% 4%; border-radius:999px; color:#fff; background:#272727; font-size:clamp(10px,1.55vw,21px); font-weight:700; font-variant-numeric:tabular-nums; }
 .success-time i { color:var(--mode-color); font-style:normal; font-size:.8em; }
 .hold-ring { --progress:0deg; position:absolute; inset:9%; border-radius:50%; background:conic-gradient(var(--mode-color,#72b9ff) var(--progress),transparent 0); mask:radial-gradient(circle,transparent 68%,#000 69%); }
 .transition-screen { position:absolute; inset:0; color:#fff; background:#000; text-align:center; }
 .transition-ring { --progress:0deg; position:absolute; inset:9.5%; border-radius:50%; transform:rotate(220deg); background:conic-gradient(var(--mode-color) var(--progress),#292929 0 280deg,transparent 280deg); mask:radial-gradient(circle,transparent 72%,#000 73% 77%,transparent 78%); }
 .feedback-symbol { position:absolute; top:24%; left:50%; width:19.45%; aspect-ratio:1; transform:translateX(-50%); }
-.transition-screen p { position:absolute; top:50%; left:14%; right:14%; margin:0; font-size:clamp(13px,1.55vw,21px); font-weight:650; line-height:1.25; }
+.transition-screen p { position:absolute; top:50%; left:14%; right:14%; margin:0; font-size:clamp(13px,1.55vw,21px); font-weight:400; line-height:1.25; }
 .transition-screen>span { position:absolute; left:0; right:0; bottom:12%; color:#999; font-size:clamp(10px,1.35vw,18px); }
 .device-controls { position:absolute; left:54.1%; top:36%; width:31.2%; display:grid; grid-template-columns:repeat(3,1fr); gap:24px 30px; }
 .device-controls button { position:relative; display:flex; min-width:0; align-items:center; justify-content:center; padding:0; border:0; background:transparent; color:#fff; cursor:pointer; }
