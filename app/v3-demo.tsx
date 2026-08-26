@@ -38,16 +38,16 @@ function LeakInspectionScreen({ step }: { step: number }) {
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={["Check Fit", "Check Tubing", "Check Cup"][step]}>
     <defs>
       <path id={pathId} d="M92 360 Q216 438 340 360" />
-      <linearGradient id={gradientId} x1="0%" y1="0" x2="35%" y2="0">
-        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".4" stopColor="#fff" stopOpacity=".16" /><stop offset=".52" stopColor="#fff" stopOpacity=".64" /><stop offset=".64" stopColor="#fff" stopOpacity=".16" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
-        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
+      <linearGradient id={gradientId} x1="-5%" y1="0" x2="45%" y2="0">
+        <stop stopColor="#fff" stopOpacity="0" /><stop offset=".25" stopColor="#fff" stopOpacity=".18" /><stop offset=".5" stopColor="#fff" stopOpacity=".58" /><stop offset=".75" stopColor="#fff" stopOpacity=".18" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
+        <animate attributeName="x1" values="-5%;60%" dur="4.2s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="45%;110%" dur="4.2s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <rect width="432" height="432" fill="#000" />
     <image href={source} x="0" y="0" width="432" height="432" />
     <rect x="158" y="48" width="116" height="70" rx="18" fill="#000" />
-    <rect x="68" y="334" width="296" height="92" fill="#000" />
+    <rect x="92" y="368" width="248" height="54" fill="#000" />
     <text className="leak-switch-base"><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
     <text className="leak-switch-shine" fill={`url(#${gradientId})`}><textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">Press to switch</textPath></text>
   </svg>;
@@ -115,10 +115,10 @@ function MenuScreen({ index, showHint }: { index: number; showHint: boolean }) {
     <defs>
       <clipPath id="menu-icon-clip"><rect x="120" y="105" width="192" height="124" /></clipPath>
       <path id="menu-hint-path" d="M98.62 333.38 A166 166 0 0 0 333.38 333.38" />
-      <linearGradient id="menu-hint-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
-        <stop stopColor="white" stopOpacity="0" /><stop offset=".4" stopColor="white" stopOpacity=".16" /><stop offset=".52" stopColor="white" stopOpacity=".64" /><stop offset=".64" stopColor="white" stopOpacity=".16" /><stop offset="1" stopColor="white" stopOpacity="0" />
-        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
+      <linearGradient id="menu-hint-shine-gradient" x1="-5%" y1="0" x2="45%" y2="0">
+        <stop stopColor="white" stopOpacity="0" /><stop offset=".25" stopColor="white" stopOpacity=".18" /><stop offset=".5" stopColor="white" stopOpacity=".58" /><stop offset=".75" stopColor="white" stopOpacity=".18" /><stop offset="1" stopColor="white" stopOpacity="0" />
+        <animate attributeName="x1" values="-5%;60%" dur="4.2s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="45%;110%" dur="4.2s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <rect width="432" height="432" fill="#000" />
@@ -168,15 +168,15 @@ function PumpScreenSvg({
     <svg className={`pump-screen-svg pump-screen-svg-${state}${leakFinal ? " pump-screen-svg-leak-final" : ""}`} viewBox="0 0 432 432" role="img" aria-label={`${modeTitles[mode]} ${state}`}>
       <defs>
         <clipPath id={`screen-circle-${state}`}><circle cx="216" cy="216" r="176" /></clipPath>
-        <linearGradient id="hint-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".4" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset=".52" stopColor={modeShineColors[mode]} stopOpacity=".64" /><stop offset=".64" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
+        <linearGradient id="hint-shine-gradient" x1="-5%" y1="0" x2="45%" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="-5%;60%" dur="4.2s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="45%;110%" dur="4.2s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="final-line-one-shine" x1="-35%" y1="0" x2="-5%" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".4" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset=".52" stopColor={modeShineColors[mode]} stopOpacity=".64" /><stop offset=".64" stopColor={modeShineColors[mode]} stopOpacity=".16" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="0%;65%" begin="1.4s" dur="2.8s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="35%;100%" begin="1.4s" dur="2.8s" repeatCount="indefinite" />
+        <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="0;370" dur="4.4s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="165;535" dur="4.4s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
 
@@ -214,8 +214,8 @@ function PumpScreenSvg({
         <LeakStepDots active={3} />
         <text x="216" y="260" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
         <text x="216" y="286" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press and hold to end pumping</text>
-        <text className="pump-hint-shine-text" x="216" y="260" textAnchor="middle" style={{ fill: "url(#final-line-one-shine)" }}>Press to resume</text>
-        <text className="pump-hint-shine-text" x="216" y="286" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>Press and hold to end pumping</text>
+        <text className="pump-hint-shine-text" x="216" y="260" textAnchor="middle" style={{ fill: "url(#final-shared-shine)" }}>Press to resume</text>
+        <text className="pump-hint-shine-text" x="216" y="286" textAnchor="middle" style={{ fill: "url(#final-shared-shine)" }}>Press and hold to end pumping</text>
       </g>}
 
       <g className="pump-svg-values">
@@ -234,10 +234,10 @@ function StandbyScreen() {
       <linearGradient id="standby-text-cleanup" x1="0" y1="116" x2="0" y2="154" gradientUnits="userSpaceOnUse">
         <stop stopColor="#0F0507" /><stop offset="1" stopColor="#160609" />
       </linearGradient>
-      <linearGradient id="standby-shine-gradient" x1="0%" y1="0" x2="35%" y2="0">
-        <stop stopColor="#FFF7FA" stopOpacity="0" /><stop offset=".4" stopColor="#FFF7FA" stopOpacity=".16" /><stop offset=".52" stopColor="#FFF7FA" stopOpacity=".64" /><stop offset=".64" stopColor="#FFF7FA" stopOpacity=".16" /><stop offset="1" stopColor="#FFF7FA" stopOpacity="0" />
-        <animate attributeName="x1" values="0%;65%" dur="2.8s" repeatCount="indefinite" />
-        <animate attributeName="x2" values="35%;100%" dur="2.8s" repeatCount="indefinite" />
+      <linearGradient id="standby-shine-gradient" x1="-5%" y1="0" x2="45%" y2="0">
+        <stop stopColor="#FFF7FA" stopOpacity="0" /><stop offset=".25" stopColor="#FFF7FA" stopOpacity=".18" /><stop offset=".5" stopColor="#FFF7FA" stopOpacity=".58" /><stop offset=".75" stopColor="#FFF7FA" stopOpacity=".18" /><stop offset="1" stopColor="#FFF7FA" stopOpacity="0" />
+        <animate attributeName="x1" values="-5%;60%" dur="4.2s" repeatCount="indefinite" />
+        <animate attributeName="x2" values="45%;110%" dur="4.2s" repeatCount="indefinite" />
       </linearGradient>
     </defs>
     <image href="/assets/screen/待机页.png" x="0" y="0" width="432" height="432" />
