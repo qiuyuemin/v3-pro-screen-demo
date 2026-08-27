@@ -4,12 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MENU_ITEMS, MODE_COLORS, MODES, PumpMode, ScreenState, V3_CONFIG } from "./v3-config";
 
 const fixedImages: Partial<Record<ScreenState, string>> = {
+  powerOnPrompt: "/assets/v3-pro/power/开机页.svg",
   boot: "/assets/screen/开屏页.png",
   finish: "/assets/v5/feedback/吸乳完成页.svg",
   modeSuccess: "/assets/v5/feedback/成功页.svg",
 };
 const stateLabels: Record<ScreenState, string> = {
-  off: "关机", boot: "启动", home: "主页", menu: "菜单", pumping: "吸奶中", paused: "暂停",
+  off: "关机", powerOnPrompt: "开机提示", boot: "启动", home: "主页", menu: "菜单", pumping: "吸奶中", paused: "暂停",
   level: "档位", endingPump: "结束中", standby: "待机", finish: "反馈", modeSuccess: "切换成功", poweringOff: "关机中",
   sealChecking: "密封检测", sealPassed: "检测通过", leakCheck: "漏气排查",
 };
@@ -325,7 +326,7 @@ export default function DeviceDemo() {
   const wheelAccumulator = useRef(0);
   const wheelGestureLocked = useRef(false);
   const wheelGestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isPowered = state !== "off" && state !== "poweringOff";
+  const isPowered = state !== "off" && state !== "powerOnPrompt" && state !== "poweringOff";
   const isRunning = pumpStatus === "running";
   const deviceControlsLocked = !isPowered || state === "boot" || state === "leakCheck";
   const modeColor = MODE_COLORS[mode];
@@ -473,7 +474,7 @@ export default function DeviceDemo() {
   }, []);
 
   const startPowerOn = useCallback(() => {
-    if (state !== "off") return;
+    if (state !== "off" && state !== "powerOnPrompt") return;
     setState("boot"); setToast("设备启动中…");
     setTimeout(() => { setState("home"); setToast("Stimulation 默认主页"); }, V3_CONFIG.bootDurationMs);
   }, [state]);
@@ -517,7 +518,8 @@ export default function DeviceDemo() {
 
   const handleScreenClick = useCallback(() => {
     if (clickLock.current) return;
-    if (state === "off") { setToast("请长按圆屏 2 秒开机"); return; }
+    if (state === "off") { setState("powerOnPrompt"); setToast("长按圆屏 2 秒即可开机"); return; }
+    if (state === "powerOnPrompt") { setToast("长按圆屏 2 秒即可开机"); return; }
     if (state === "boot") return;
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
@@ -593,9 +595,9 @@ export default function DeviceDemo() {
   }, [clearTransition, transitionKind]);
 
   const beginHold = useCallback(() => {
-    if (!(["off", "home", "paused", "pumping", "menu", "level", "sealChecking", "sealPassed", "leakCheck"] as ScreenState[]).includes(state)) return;
+    if (!(["off", "powerOnPrompt", "home", "paused", "pumping", "menu", "level", "sealChecking", "sealPassed", "leakCheck"] as ScreenState[]).includes(state)) return;
     clickLock.current = false;
-    if (state !== "off") {
+    if (state !== "off" && state !== "powerOnPrompt") {
       holdStart.current = Date.now();
       holdTimer.current = setInterval(() => {
         if (Date.now() - holdStart.current < V3_CONFIG.longPressActivationMs) return;
@@ -605,6 +607,10 @@ export default function DeviceDemo() {
         beginTransitionHold(pumpStatus === "idle" ? "poweroff" : "finish");
       }, 40);
       return;
+    }
+    if (state === "off") {
+      setState("powerOnPrompt");
+      setToast("长按圆屏 2 秒即可开机");
     }
     holdStart.current = Date.now();
     holdTimer.current = setInterval(() => {
@@ -709,7 +715,7 @@ export default function DeviceDemo() {
               <p>{state === "endingPump" ? <>Press and hold to<br />end pumping.</> : <>Press and hold to<br />power off.</>}</p>
               <span>{Math.max(1, Math.ceil((100 - transitionProgress) / 100 * 3))}s</span>
             </div>}
-            {holdProgress > 0 && <div className="hold-ring" style={{ "--progress": `${holdProgress * 3.6}deg` } as React.CSSProperties}><span /></div>}
+            {state === "powerOnPrompt" && holdProgress > 0 && <ArcProgress percent={holdProgress} color="#F3F4FF" />}
           </div>
 
           <div className="device-controls" aria-label="设备实体按键">
