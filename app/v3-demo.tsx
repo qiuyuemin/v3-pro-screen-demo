@@ -188,7 +188,7 @@ function PumpScreenSvg({
 
       {isPumping && <>
         <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
-        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="184" width="360" height="108" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
+        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="210" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
       {isPaused && <>
@@ -311,6 +311,7 @@ export default function DeviceDemo() {
   const [showDebug, setShowDebug] = useState(false);
   const [toast, setToast] = useState("长按圆屏 2 秒开机");
   const [holdProgress, setHoldProgress] = useState(0);
+  const [powerOnPromptActivity, setPowerOnPromptActivity] = useState(0);
   const [transitionProgress, setTransitionProgress] = useState(0);
   const [transitionKind, setTransitionKind] = useState<"finish" | "poweroff" | null>(null);
   const holdTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -353,6 +354,15 @@ export default function DeviceDemo() {
     standbyTimer.current = setTimeout(() => setState("off"), V3_CONFIG.powerOffAfterMs);
     return () => { if (standbyTimer.current) clearTimeout(standbyTimer.current); };
   }, [state]);
+  useEffect(() => {
+    if (state !== "powerOnPrompt") return;
+    const timer = setTimeout(() => {
+      setState("off");
+      setHoldProgress(0);
+      setToast("长按圆屏 2 秒开机");
+    }, V3_CONFIG.powerOnPromptTimeoutMs);
+    return () => clearTimeout(timer);
+  }, [powerOnPromptActivity, state]);
   useEffect(() => {
     if (!isRunning) return;
     const timer = setInterval(() => setSeconds((value) => value + 1), 1000);
@@ -518,8 +528,8 @@ export default function DeviceDemo() {
 
   const handleScreenClick = useCallback(() => {
     if (clickLock.current) return;
-    if (state === "off") { setState("powerOnPrompt"); setToast("长按圆屏 2 秒即可开机"); return; }
-    if (state === "powerOnPrompt") { setToast("长按圆屏 2 秒即可开机"); return; }
+    if (state === "off") { setState("powerOnPrompt"); setPowerOnPromptActivity((value) => value + 1); setToast("长按圆屏 2 秒即可开机"); return; }
+    if (state === "powerOnPrompt") { setPowerOnPromptActivity((value) => value + 1); setToast("长按圆屏 2 秒即可开机"); return; }
     if (state === "boot") return;
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
@@ -582,6 +592,7 @@ export default function DeviceDemo() {
   const stopHold = useCallback(() => {
     if (holdTimer.current) clearInterval(holdTimer.current);
     holdTimer.current = null; setHoldProgress(0);
+    if (state === "powerOnPrompt") setPowerOnPromptActivity((value) => value + 1);
     if (transitionKind) {
       const rollback = transitionReturnState.current;
       clickLock.current = true;
@@ -592,7 +603,7 @@ export default function DeviceDemo() {
     } else if (clickLock.current) {
       setTimeout(() => { clickLock.current = false; }, 250);
     }
-  }, [clearTransition, transitionKind]);
+  }, [clearTransition, state, transitionKind]);
 
   const beginHold = useCallback(() => {
     if (!(["off", "powerOnPrompt", "home", "paused", "pumping", "menu", "level", "sealChecking", "sealPassed", "leakCheck"] as ScreenState[]).includes(state)) return;
@@ -612,6 +623,7 @@ export default function DeviceDemo() {
       setState("powerOnPrompt");
       setToast("长按圆屏 2 秒即可开机");
     }
+    setPowerOnPromptActivity((value) => value + 1);
     holdStart.current = Date.now();
     holdTimer.current = setInterval(() => {
       const elapsed = Date.now() - holdStart.current;

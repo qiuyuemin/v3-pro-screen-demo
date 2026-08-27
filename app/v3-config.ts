@@ -1,6 +1,7 @@
 export const V3_CONFIG = {
   longPressMs: 2000,
   powerOnProgressDelayMs: 250,
+  powerOnPromptTimeoutMs: 5000,
   longPressActivationMs: 450,
   finishHoldMs: 3000,
   powerOffHoldMs: 3000,
