@@ -615,7 +615,9 @@ export default function DeviceDemo() {
     holdStart.current = Date.now();
     holdTimer.current = setInterval(() => {
       const elapsed = Date.now() - holdStart.current;
-      setHoldProgress(Math.min(100, elapsed / V3_CONFIG.longPressMs * 100));
+      const visibleElapsed = Math.max(0, elapsed - V3_CONFIG.powerOnProgressDelayMs);
+      const visibleDuration = V3_CONFIG.longPressMs - V3_CONFIG.powerOnProgressDelayMs;
+      setHoldProgress(Math.min(100, visibleElapsed / visibleDuration * 100));
       if (elapsed >= V3_CONFIG.longPressMs) {
         clickLock.current = true; stopHold();
         setTimeout(() => { clickLock.current = false; }, 250);
