@@ -188,7 +188,7 @@ function PumpScreenSvg({
 
       {isPumping && <>
         <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
-        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="210" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
+        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="218" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
       {isPaused && <>
@@ -619,11 +619,7 @@ export default function DeviceDemo() {
       }, 40);
       return;
     }
-    if (state === "off") {
-      setState("powerOnPrompt");
-      setToast("长按圆屏 2 秒即可开机");
-    }
-    setPowerOnPromptActivity((value) => value + 1);
+    if (state === "powerOnPrompt") setPowerOnPromptActivity((value) => value + 1);
     holdStart.current = Date.now();
     holdTimer.current = setInterval(() => {
       const elapsed = Date.now() - holdStart.current;
