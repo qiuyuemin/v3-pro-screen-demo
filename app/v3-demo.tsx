@@ -423,7 +423,7 @@ export default function DeviceDemo() {
   const [leakStep, setLeakStep] = useState(0);
   const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
-  const [showDebug, setShowDebug] = useState(false);
+  const [showDebug, setShowDebug] = useState(true);
   const [toast, setToast] = useState("长按圆屏 2 秒开机");
   const [holdProgress, setHoldProgress] = useState(0);
   const [powerOnPromptActivity, setPowerOnPromptActivity] = useState(0);
@@ -821,7 +821,7 @@ export default function DeviceDemo() {
         <div className="brand-block"><span className="eyebrow">MOMCOZY · V3 PRO</span><h1>整机交互 Demo</h1></div>
         <div className="solution-switch" aria-label="交互方案">
           <button className={solution === 1 ? "active" : ""} onClick={() => setSolution(1)}>方案一</button>
-          <button className={solution === 2 ? "active" : ""} onClick={() => { setSolution(2); setToast("方案二接口已预留，等待交互素材"); }}>方案二 <small>待接入</small></button>
+          <button className={solution === 2 ? "active" : ""} onClick={() => { setSolution(2); setToast("已切换至方案二"); }}>方案二</button>
         </div>
       </header>
 
@@ -871,10 +871,6 @@ export default function DeviceDemo() {
       <aside className="guide-panel">
         <button className="panel-toggle" onClick={() => setShowGuide(!showGuide)}>{showGuide ? "收起操作指南" : "展开操作指南"}</button>
         {showGuide && <div className="guide-content"><h2>Demo 操作指南</h2><div className="guide-grid"><div><b>鼠标 / 触控板</b><p>点按：确认 / 开始暂停</p><p>长按 2 秒：开机</p><p>长按 3 秒：结束 / 关机</p><p>双指滚动：圆钮选择</p></div><div><b>键盘</b><p>Q / W / E：模式</p><p>A / D：左右档位</p><p>S：开始 / 暂停</p></div></div></div>}
-      </aside>
-
-      <aside className="leak-demo-panel">
-        <button className="leak-demo-toggle" onClick={triggerSevereLeak}>严重漏气</button>
       </aside>
 
       <aside className="debug-panel">
