@@ -187,7 +187,7 @@ function PumpScreenSvg({
       {((isPaused && !leakFinal) || state === "home") && <text className="pump-hint-shine-text" x="216" y="261" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{hint}</text>}
 
       {isPumping && <>
-        <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
+        {!isSealStatus && <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>}
         {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="218" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
@@ -198,6 +198,14 @@ function PumpScreenSvg({
       {state === "home" && <>
         <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
       </>}
+
+      {state === "sealChecking" && <foreignObject x="171" y="140" width="90" height="90" aria-label="Checking seal loading">
+        <div className="seal-loading-indicator"><span /></div>
+      </foreignObject>}
+      {state === "sealPassed" && <g className="seal-passed-icon" aria-label="Seal check passed">
+        <circle className="seal-passed-icon-bg" cx="216" cy="185" r="24" />
+        <path className="seal-passed-icon-check" d="M204 185.5L212.5 194L229 176" />
+      </g>}
 
       {isSealStatus && <g className="seal-status-hint">
         <text x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
@@ -375,7 +383,10 @@ export default function DeviceDemo() {
       return () => clearTimeout(timer);
     }
     if (state === "sealPassed") {
-      const timer = setTimeout(() => { setState("pumping"); setToast("密封检测通过，开始正常吸奶"); }, 2000);
+      const timer = setTimeout(() => {
+        setState("pumping");
+        setToast("密封检测通过，开始正常吸奶");
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [state]);
@@ -418,7 +429,7 @@ export default function DeviceDemo() {
     } else if (pumpStatus === "paused") {
       setPumpStatus("running"); setState("pumping"); setToast("继续吸奶");
     } else {
-      setPumpStatus("running"); setState("sealChecking"); setToast("Checking seal...");
+      setSeconds(0); setPumpStatus("running"); setState("sealChecking"); setToast("Checking seal...");
     }
   }, [isPowered, pumpStatus, seconds, state, wake]);
 
@@ -671,6 +682,7 @@ export default function DeviceDemo() {
     if (target === "home") { setPumpStatus("idle"); setSeconds(0); }
     if (target === "pumping" || target === "sealChecking") setPumpStatus("running");
     if (target === "paused" || target === "leakCheck") setPumpStatus("paused");
+    if (target === "sealChecking") setSeconds(0);
     if (target === "leakCheck") setLeakStep(0);
     if (target === "standby") setPreviousState(pumpStatus === "running" ? "pumping" : pumpStatus === "paused" ? "paused" : "home");
     if (target === "off") { setPumpStatus("idle"); setSeconds(0); }

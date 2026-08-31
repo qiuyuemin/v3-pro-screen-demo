@@ -41,6 +41,15 @@ button { font:inherit; }
 .pump-svg-hint { font-size:19px; font-weight:400; letter-spacing:-.25px; }
 .pump-hint-shine-text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.25px; }
 .seal-status-hint text,.leak-final-overlay text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.25px; }
+.seal-loading-indicator { position:relative; display:grid; width:90px; height:90px; place-items:center; }
+.seal-loading-indicator::before { content:""; width:66px; height:66px; border-radius:50%; background:conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.9) 360deg); -webkit-mask:radial-gradient(circle,transparent 0 17px,#000 18px 33px,transparent 34px); mask:radial-gradient(circle,transparent 0 17px,#000 18px 33px,transparent 34px); animation:sealLoaderSpin 2s linear infinite; }
+.seal-loading-indicator span { position:absolute; width:33px; height:33px; border-radius:50%; background:rgba(255,255,255,.5); }
+@keyframes sealLoaderSpin { to { transform:rotate(360deg); } }
+.seal-passed-icon { transform-origin:216px 185px; }
+.seal-passed-icon-bg { fill:#fff; opacity:.18; transform-origin:216px 185px; animation:sealPassedCircleIn .38s cubic-bezier(.2,.8,.2,1) both; }
+.seal-passed-icon-check { fill:none; stroke:#fff; stroke-width:3.5px; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:40; stroke-dashoffset:40; animation:sealPassedCheckIn .42s .12s cubic-bezier(.3,.8,.3,1) forwards; }
+@keyframes sealPassedCircleIn { 0% { opacity:0; transform:scale(.08); } 55% { opacity:.2; transform:scale(1.08); } 100% { opacity:.18; transform:scale(1); } }
+@keyframes sealPassedCheckIn { to { stroke-dashoffset:0; } }
 .leak-step-dots circle { fill:#4d4d4d; }
 .leak-step-dots circle.active { fill:#fff; }
 .pump-svg-values text { font-size:26px; font-weight:400; font-variant-numeric:tabular-nums; }
