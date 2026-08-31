@@ -39,6 +39,7 @@ function LeakInspectionScreen({ step }: { step: number }) {
       <video src="/assets/v3-pro/leak/step-1-animation.mp4" autoPlay muted loop playsInline preload="auto" />
     </div>;
   }
+  if (step === 1) return <LeakFitAnimation />;
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -50,6 +51,47 @@ function LeakInspectionScreen({ step }: { step: number }) {
     <path d="M152 40H280V66H152Z" fill="#000" clipPath={`url(#leak-inner-screen-${step})`} />
     <LeakStepDots active={step} />
   </svg>;
+}
+
+function LeakFitAnimation() {
+  const [showCorrectFit, setShowCorrectFit] = useState(false);
+  const [cycle, setCycle] = useState(0);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+  }, []);
+
+  const showCorrectFitForTwoSeconds = () => {
+    setShowCorrectFit(true);
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = setTimeout(() => {
+      setShowCorrectFit(false);
+      setCycle((value) => value + 1);
+    }, 2000);
+  };
+
+  return <div className="leak-fit-animation-screen" role="img" aria-label={leakPageLabels[1]}>
+    <svg viewBox="0 0 432 432" aria-hidden="true">
+      <circle cx="216" cy="216" r="216" fill="#000" />
+      <LeakStepDots active={1} />
+      <text x="216" y="106" textAnchor="middle" className="leak-fit-title">Check Fit</text>
+      <text x="216" y="349" textAnchor="middle" className="leak-fit-instruction">
+        <tspan x="216">Center the nipple</tspan>
+        <tspan x="216" dy="25">Seal flange firmly</tspan>
+      </text>
+    </svg>
+    {!showCorrectFit && <video
+      key={cycle}
+      src="/assets/v3-pro/leak/step-2-animation.mp4"
+      autoPlay
+      muted
+      playsInline
+      preload="auto"
+      onEnded={showCorrectFitForTwoSeconds}
+    />}
+    {showCorrectFit && <img src="/assets/v3-pro/leak/step-2-correct.svg" alt="" aria-hidden="true" />}
+  </div>;
 }
 
 function LeakStepDots({ active }: { active: number }) {
@@ -172,11 +214,18 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="seal-passed-shine-gradient" gradientUnits="userSpaceOnUse" x1="113" y1="0" x2="163" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".24" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".62" /><stop offset=".76" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="113;269" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
-          <animate attributeName="x2" values="163;319" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
+        <linearGradient id="seal-passed-sweep-band" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="54" y2="0">
+          <stop stopColor="white" stopOpacity="0" />
+          <stop offset=".28" stopColor="white" stopOpacity=".2" />
+          <stop offset=".5" stopColor="white" stopOpacity="1" />
+          <stop offset=".72" stopColor="white" stopOpacity=".2" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
+        <mask id="seal-passed-sweep-mask" maskUnits="userSpaceOnUse" x="100" y="232" width="232" height="42">
+          <rect x="111" y="232" width="54" height="42" fill="url(#seal-passed-sweep-band)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;158 0" begin="0s" dur="1.8s" repeatCount="1" fill="freeze" />
+          </rect>
+        </mask>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
           <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
@@ -214,7 +263,7 @@ function PumpScreenSvg({
 
       {isSealStatus && <g className="seal-status-hint">
         <text x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={state === "sealPassed" ? { fill: modeShineColors[mode], mask: "url(#seal-passed-sweep-mask)" } : { fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">

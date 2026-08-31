@@ -57,6 +57,13 @@ button { font:inherit; }
 .leak-workflow-screen { position:absolute; z-index:3; inset:0; display:block; width:100%; height:100%; overflow:hidden; background:#000; }
 .leak-workflow-video-screen { position:absolute; z-index:3; inset:0; overflow:hidden; border-radius:50%; background:#000; pointer-events:none; }
 .leak-workflow-video-screen video { position:absolute; inset:9.259%; display:block; width:81.482%; height:81.482%; border-radius:50%; object-fit:cover; }
+.leak-fit-animation-screen { position:absolute; z-index:3; inset:0; overflow:hidden; border-radius:50%; background:#000; pointer-events:none; }
+.leak-fit-animation-screen svg,.leak-fit-animation-screen img { position:absolute; inset:0; display:block; width:100%; height:100%; }
+.leak-fit-animation-screen video { position:absolute; z-index:1; left:25.926%; top:28.241%; display:block; width:48.148%; height:48.148%; object-fit:contain; background:#000; }
+.leak-fit-animation-screen img { z-index:2; }
+.leak-fit-title,.leak-fit-instruction { fill:#fff; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-weight:400; }
+.leak-fit-title { font-size:25px; }
+.leak-fit-instruction { fill:#a9a5a7; font-size:19px; }
 .leak-switch-base,.leak-switch-shine { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.2px; }
 .leak-switch-base { fill:#929292; }
 .leak-switch-shine,.menu-hint-shine-text,.standby-shine-text,.pump-screen-svg:not(.pump-screen-svg-leak-final) .pump-hint-shine-text { animation:shineEnvelope 3.6s linear infinite; }
