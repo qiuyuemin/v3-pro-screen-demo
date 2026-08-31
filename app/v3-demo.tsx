@@ -169,8 +169,8 @@ function PumpScreenSvg({
         </linearGradient>
         <linearGradient id="seal-passed-shine-gradient" x1="-20%" y1="0" x2="38%" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".24" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".62" /><stop offset=".76" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="-20%;115%" dur="1.45s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="38%;173%" dur="1.45s" repeatCount="indefinite" />
+          <animate attributeName="x1" values="-20%;115%" dur="2s" repeatCount="1" fill="freeze" />
+          <animate attributeName="x2" values="38%;173%" dur="2s" repeatCount="1" fill="freeze" />
         </linearGradient>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
@@ -188,7 +188,7 @@ function PumpScreenSvg({
 
       {isPumping && <>
         {!isSealStatus && <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>}
-        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="218" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
+        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="240" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
       {isPaused && <>
@@ -203,8 +203,8 @@ function PumpScreenSvg({
         <div className="seal-loading-indicator"><span /></div>
       </foreignObject>}
       {state === "sealPassed" && <g className="seal-passed-icon" aria-label="Seal check passed">
-        <circle className="seal-passed-icon-bg" cx="216" cy="185" r="24" />
-        <path className="seal-passed-icon-check" d="M204 185.5L212.5 194L229 176" />
+        <circle className="seal-passed-icon-bg" cx="216" cy="185" r="33" />
+        <path className="seal-passed-icon-check" d="M201.795 190.058C201.795 190.058 204.839 190.058 208.898 197.161C208.898 197.161 220.178 178.559 230.205 174.839" />
       </g>}
 
       {isSealStatus && <g className="seal-status-hint">
