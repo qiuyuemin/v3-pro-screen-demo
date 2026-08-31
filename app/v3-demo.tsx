@@ -40,11 +40,7 @@ function LeakInspectionScreen({ step }: { step: number }) {
     </div>;
   }
   if (step === 1) return <LeakFitAnimation />;
-  if (step === 2) {
-    return <div className="leak-workflow-video-screen" role="img" aria-label={leakPageLabels[step]}>
-      <video src="/assets/v3-pro/leak/step-3-animation.mp4" autoPlay muted loop playsInline preload="auto" />
-    </div>;
-  }
+  if (step === 2) return <LeakCupAnimation />;
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -56,6 +52,57 @@ function LeakInspectionScreen({ step }: { step: number }) {
     <path d="M152 40H280V66H152Z" fill="#000" clipPath={`url(#leak-inner-screen-${step})`} />
     <LeakStepDots active={step} />
   </svg>;
+}
+
+function LeakCupAnimation() {
+  const videoRefs = [useRef<HTMLVideoElement | null>(null), useRef<HTMLVideoElement | null>(null)];
+  const [activeVideo, setActiveVideo] = useState(0);
+  const middlePauseDone = useRef([false, false]);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const pauseBrieflyInTheMiddle = (index: number) => {
+    const video = videoRefs[index].current;
+    if (!video || index !== activeVideo || middlePauseDone.current[index] || video.currentTime < 5) return;
+    middlePauseDone.current[index] = true;
+    video.pause();
+    timers.current.push(setTimeout(() => { if (index === activeVideo) void video.play(); }, 650));
+  };
+
+  const crossfadeToBeginning = (index: number) => {
+    if (index !== activeVideo) return;
+    timers.current.push(setTimeout(() => {
+      const nextIndex = index === 0 ? 1 : 0;
+      const nextVideo = videoRefs[nextIndex].current;
+      const oldVideo = videoRefs[index].current;
+      if (!nextVideo || !oldVideo) return;
+      nextVideo.currentTime = 0;
+      middlePauseDone.current[nextIndex] = false;
+      void nextVideo.play();
+      setActiveVideo(nextIndex);
+      timers.current.push(setTimeout(() => {
+        oldVideo.pause();
+        oldVideo.currentTime = 0;
+        middlePauseDone.current[index] = false;
+      }, 600));
+    }, 1000));
+  };
+
+  return <div className="leak-cup-video-screen" role="img" aria-label={leakPageLabels[2]}>
+    {[0, 1].map((index) => <video
+      key={index}
+      ref={videoRefs[index]}
+      className={index === activeVideo ? "is-active" : ""}
+      src="/assets/v3-pro/leak/step-3-animation.mp4"
+      autoPlay={index === 0}
+      muted
+      playsInline
+      preload="auto"
+      onTimeUpdate={() => pauseBrieflyInTheMiddle(index)}
+      onEnded={() => crossfadeToBeginning(index)}
+    />)}
+  </div>;
 }
 
 function LeakFitAnimation() {
@@ -228,7 +275,7 @@ function PumpScreenSvg({
         <linearGradient id="seal-passed-shine-gradient" gradientUnits="userSpaceOnUse" x1="105" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" />
           <stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" />
-          <stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".7" />
+          <stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".42" />
           <stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" />
           <stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
           <animate attributeName="x1" values="105;278" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
