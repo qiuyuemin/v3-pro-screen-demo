@@ -55,7 +55,7 @@ function LeakInspectionScreen({ step }: { step: number }) {
 
 function LeakFitAnimation() {
   const [showCorrectFit, setShowCorrectFit] = useState(false);
-  const [cycle, setCycle] = useState(0);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
@@ -66,9 +66,15 @@ function LeakFitAnimation() {
     setShowCorrectFit(true);
     if (holdTimer.current) clearTimeout(holdTimer.current);
     holdTimer.current = setTimeout(() => {
-      setShowCorrectFit(false);
-      setCycle((value) => value + 1);
-    }, 2000);
+      const video = videoRef.current;
+      if (!video) return;
+      const revealRestartedVideo = () => {
+        void video.play();
+        requestAnimationFrame(() => setShowCorrectFit(false));
+      };
+      video.addEventListener("seeked", revealRestartedVideo, { once: true });
+      video.currentTime = 0;
+    }, 2200);
   };
 
   return <div className="leak-fit-animation-screen" role="img" aria-label={leakPageLabels[1]}>
@@ -81,16 +87,16 @@ function LeakFitAnimation() {
         <tspan x="216" dy="25">Seal flange firmly</tspan>
       </text>
     </svg>
-    {!showCorrectFit && <video
-      key={cycle}
+    <video
+      ref={videoRef}
       src="/assets/v3-pro/leak/step-2-animation.mp4"
       autoPlay
       muted
       playsInline
       preload="auto"
       onEnded={showCorrectFitForTwoSeconds}
-    />}
-    {showCorrectFit && <img src="/assets/v3-pro/leak/step-2-correct.svg" alt="" aria-hidden="true" />}
+    />
+    <img className={showCorrectFit ? "is-visible" : ""} src="/assets/v3-pro/leak/step-2-correct.svg" alt="" aria-hidden="true" />
   </div>;
 }
 
@@ -214,7 +220,7 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="seal-passed-sweep-band" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="54" y2="0">
+        <linearGradient id="seal-passed-sweep-band" x1="0" y1="0" x2="1" y2="0">
           <stop stopColor="white" stopOpacity="0" />
           <stop offset=".28" stopColor="white" stopOpacity=".2" />
           <stop offset=".5" stopColor="white" stopOpacity="1" />
@@ -222,8 +228,8 @@ function PumpScreenSvg({
           <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <mask id="seal-passed-sweep-mask" maskUnits="userSpaceOnUse" x="100" y="232" width="232" height="42">
-          <rect x="111" y="232" width="54" height="42" fill="url(#seal-passed-sweep-band)">
-            <animateTransform attributeName="transform" type="translate" values="0 0;158 0" begin="0s" dur="1.8s" repeatCount="1" fill="freeze" />
+          <rect x="104" y="232" width="64" height="42" fill="url(#seal-passed-sweep-band)">
+            <animateTransform attributeName="transform" type="translate" values="0 0;190 0" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
           </rect>
         </mask>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
