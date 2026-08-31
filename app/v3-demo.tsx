@@ -152,25 +152,10 @@ function LeakFitAnimation() {
   </div>;
 }
 
-function LeakFinalAnimation({ mode }: { mode: PumpMode }) {
+function LeakFinalAnimation() {
   return <div className="leak-final-animation-screen" role="img" aria-label="严重漏气排查第 4 步">
+    <img src="/assets/v3-pro/leak/step-4-layout.svg" alt="" aria-hidden="true" />
     <video src="/assets/v3-pro/leak/step-4-animation.mp4" autoPlay muted loop playsInline preload="auto" />
-    <svg viewBox="0 0 432 432" aria-hidden="true">
-      <defs>
-        <linearGradient id="leak-final-animation-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
-        </linearGradient>
-      </defs>
-      <LeakStepDots active={3} />
-      <g className="leak-final-animation-copy">
-        <text x="216" y="273" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
-        <text x="216" y="299" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press &amp; hold to end pumping</text>
-        <text x="216" y="273" textAnchor="middle" style={{ fill: "url(#leak-final-animation-shine)" }}>Press to resume</text>
-        <text x="216" y="299" textAnchor="middle" style={{ fill: "url(#leak-final-animation-shine)" }}>Press &amp; hold to end pumping</text>
-      </g>
-    </svg>
   </div>;
 }
 
@@ -555,6 +540,16 @@ export default function DeviceDemo() {
     }
   }, [isPowered, pumpStatus, seconds, state, wake]);
 
+  const handlePauseButton = useCallback(() => {
+    if (state === "leakCheck") {
+      setPumpStatus("running");
+      setState("pumping");
+      setToast("漏气排查已暂停，继续吸奶");
+      return;
+    }
+    togglePump();
+  }, [state, togglePump]);
+
   const triggerSevereLeak = useCallback(() => {
     if (pumpStatus !== "running") { setToast("严重漏气检测仅可在吸奶中触发"); return; }
     setPumpStatus("paused"); setLeakStep(0); setState("leakCheck");
@@ -842,7 +837,7 @@ export default function DeviceDemo() {
             {state === "menu" && <MenuScreen index={menuIndex} showHint={pumpStatus === "idle"} />}
             {state === "modeSuccess" && <SuccessTimerArea seconds={seconds} status={pumpStatus} />}
             {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen key={`leak-step-${leakStep}`} step={leakStep} />}
-            {state === "leakCheck" && leakStep === 3 && <LeakFinalAnimation key={`leak-final-${mode}`} mode={mode} />}
+            {state === "leakCheck" && leakStep === 3 && <LeakFinalAnimation key={`leak-final-${mode}`} />}
             {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg key={`pump-${state}-${mode}`} state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
             {state === "level" && <div className="dynamic-level">
               {activeControl === "speed"
@@ -862,11 +857,11 @@ export default function DeviceDemo() {
             {state === "powerOnPrompt" && holdProgress > 0 && <ArcProgress percent={holdProgress} color="#F3F4FF" />}
           </div>
 
-          <div className="device-controls" aria-label="设备实体按键">
+          <div className={`device-controls${state === "leakCheck" ? ` is-leak-check solution-${solution}` : ""}`} aria-label="设备实体按键">
             {MODES.map((item) => <button key={item.id} onClick={() => showTemporary(item.id)} disabled={deviceControlsLocked} aria-label={item.label}><img className="button-art" src={`/assets/v5/device-buttons/${item.id === "stimulation" ? "Stimulate" : "Expression"}.svg`} alt={item.label} /></button>)}
             <button onClick={() => openLevel("speed")} disabled={deviceControlsLocked} aria-label="Speed"><img className="button-art" src="/assets/v5/device-buttons/Speed.svg" alt="Speed" /></button>
             <button onClick={() => openLevel("left")} disabled={deviceControlsLocked} aria-label="Left"><img className="button-art" src="/assets/v5/device-buttons/Left.svg" alt="Left" /></button>
-            <button onClick={togglePump} disabled={deviceControlsLocked} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
+            <button className="pause-control-button" onClick={handlePauseButton} disabled={deviceControlsLocked && state !== "leakCheck"} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
             <button onClick={() => openLevel("right")} disabled={deviceControlsLocked} aria-label="Right"><img className="button-art" src="/assets/v5/device-buttons/Right.svg" alt="Right" /></button>
           </div>
         </div>

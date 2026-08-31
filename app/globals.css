@@ -69,9 +69,8 @@ button { font:inherit; }
 .leak-fit-title { font-size:25px; }
 .leak-fit-instruction { fill:#a9a5a7; font-size:19px; }
 .leak-final-animation-screen { position:absolute; z-index:3; inset:0; overflow:hidden; border-radius:50%; background:#000; pointer-events:none; }
-.leak-final-animation-screen video { position:absolute; z-index:1; left:24.306%; top:16.898%; display:block; width:57.87%; height:57.87%; object-fit:cover; background:#000; }
-.leak-final-animation-screen svg { position:absolute; z-index:2; inset:0; display:block; width:100%; height:100%; }
-.leak-final-animation-copy text { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.25px; }
+.leak-final-animation-screen img { position:absolute; z-index:1; inset:0; display:block; width:100%; height:100%; }
+.leak-final-animation-screen video { position:absolute; z-index:2; left:15.046%; top:7.639%; display:block; width:57.87%; height:57.87%; object-fit:cover; background:#000; }
 .leak-switch-base,.leak-switch-shine { font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; font-size:19px; font-weight:400; letter-spacing:-.2px; }
 .leak-switch-base { fill:#929292; }
 .leak-switch-shine,.menu-hint-shine-text,.standby-shine-text,.pump-screen-svg:not(.pump-screen-svg-leak-final) .pump-hint-shine-text { animation:shineEnvelope 3.6s linear infinite; }
@@ -138,6 +137,11 @@ button { font:inherit; }
 .device-controls button:hover .button-art { transform:scale(1.04); filter:drop-shadow(0 0 7px #fff8); }
 .device-controls button:active .button-art { transform:scale(.95); filter:drop-shadow(0 0 4px #fff5); }
 .device-controls button:disabled { opacity:.2; cursor:not-allowed; }
+.device-controls.is-leak-check button:disabled { opacity:.1; filter:saturate(0) brightness(.38); }
+.device-controls.is-leak-check .pause-control-button { opacity:1; }
+.device-controls.is-leak-check.solution-1 .pause-control-button .button-art { animation:leakPauseSlowBlink 1s ease-in-out infinite; }
+.device-controls.is-leak-check.solution-2 .pause-control-button .button-art { opacity:1; filter:brightness(1.18) drop-shadow(0 0 7px rgba(255,255,255,.62)); }
+@keyframes leakPauseSlowBlink { 0%,100% { opacity:.42; filter:brightness(.72) drop-shadow(0 0 2px rgba(255,255,255,.16)); } 50% { opacity:1; filter:brightness(1.18) drop-shadow(0 0 7px rgba(255,255,255,.62)); } }
 .status-toast { position:fixed; z-index:35; top:24px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:9px; max-width:46vw; padding:10px 16px; border:1px solid #ffffff33; border-radius:999px; color:white; background:#202020e8; box-shadow:0 8px 24px #0002; font-size:12px; backdrop-filter:blur(12px); }
 .dot { width:7px; height:7px; border-radius:50%; background:#7b7b7b; }
 .dot.on { background:#66d28e; box-shadow:0 0 9px #66d28e; }
