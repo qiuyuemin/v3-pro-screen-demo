@@ -34,6 +34,11 @@ function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery
 }
 
 function LeakInspectionScreen({ step }: { step: number }) {
+  if (step === 0) {
+    return <div className="leak-workflow-video-screen" role="img" aria-label={leakPageLabels[step]}>
+      <video src="/assets/v3-pro/leak/step-1-animation.mp4" autoPlay muted loop playsInline preload="auto" />
+    </div>;
+  }
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -167,10 +172,10 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="seal-passed-shine-gradient" x1="-20%" y1="0" x2="38%" y2="0">
+        <linearGradient id="seal-passed-shine-gradient" gradientUnits="userSpaceOnUse" x1="113" y1="0" x2="163" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".24" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".62" /><stop offset=".76" stopColor={modeShineColors[mode]} stopOpacity=".2" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="-20%;115%" dur="2s" repeatCount="1" fill="freeze" />
-          <animate attributeName="x2" values="38%;173%" dur="2s" repeatCount="1" fill="freeze" />
+          <animate attributeName="x1" values="113;269" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
+          <animate attributeName="x2" values="163;319" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
         </linearGradient>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
@@ -188,7 +193,7 @@ function PumpScreenSvg({
 
       {isPumping && <>
         {!isSealStatus && <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>}
-        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="240" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
+        {!isSealStatus && <image className="pump-sequence-curve" href={modeAnimatedCurves[mode]} x="36" y="234" width="360" height="56" preserveAspectRatio="none" clipPath={`url(#screen-circle-${state})`} />}
       </>}
 
       {isPaused && <>
