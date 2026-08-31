@@ -40,6 +40,11 @@ function LeakInspectionScreen({ step }: { step: number }) {
     </div>;
   }
   if (step === 1) return <LeakFitAnimation />;
+  if (step === 2) {
+    return <div className="leak-workflow-video-screen" role="img" aria-label={leakPageLabels[step]}>
+      <video src="/assets/v3-pro/leak/step-3-animation.mp4" autoPlay muted loop playsInline preload="auto" />
+    </div>;
+  }
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -220,18 +225,15 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="seal-passed-sweep-band" x1="0" y1="0" x2="1" y2="0">
-          <stop stopColor="white" stopOpacity="0" />
-          <stop offset=".28" stopColor="white" stopOpacity=".2" />
-          <stop offset=".5" stopColor="white" stopOpacity="1" />
-          <stop offset=".72" stopColor="white" stopOpacity=".2" />
-          <stop offset="1" stopColor="white" stopOpacity="0" />
+        <linearGradient id="seal-passed-shine-gradient" gradientUnits="userSpaceOnUse" x1="105" y1="0" x2="165" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" />
+          <stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".7" />
+          <stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" />
+          <stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="105;278" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
+          <animate attributeName="x2" values="165;338" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
         </linearGradient>
-        <mask id="seal-passed-sweep-mask" maskUnits="userSpaceOnUse" x="100" y="232" width="232" height="42">
-          <rect x="104" y="232" width="64" height="42" fill="url(#seal-passed-sweep-band)">
-            <animateTransform attributeName="transform" type="translate" values="0 0;190 0" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
-          </rect>
-        </mask>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
           <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
@@ -269,7 +271,7 @@ function PumpScreenSvg({
 
       {isSealStatus && <g className="seal-status-hint">
         <text x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={state === "sealPassed" ? { fill: modeShineColors[mode], mask: "url(#seal-passed-sweep-mask)" } : { fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">
