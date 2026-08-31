@@ -152,6 +152,28 @@ function LeakFitAnimation() {
   </div>;
 }
 
+function LeakFinalAnimation({ mode }: { mode: PumpMode }) {
+  return <div className="leak-final-animation-screen" role="img" aria-label="严重漏气排查第 4 步">
+    <video src="/assets/v3-pro/leak/step-4-animation.mp4" autoPlay muted loop playsInline preload="auto" />
+    <svg viewBox="0 0 432 432" aria-hidden="true">
+      <defs>
+        <linearGradient id="leak-final-animation-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
+          <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
+          <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
+        </linearGradient>
+      </defs>
+      <LeakStepDots active={3} />
+      <g className="leak-final-animation-copy">
+        <text x="216" y="273" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press to resume</text>
+        <text x="216" y="299" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>Press &amp; hold to end pumping</text>
+        <text x="216" y="273" textAnchor="middle" style={{ fill: "url(#leak-final-animation-shine)" }}>Press to resume</text>
+        <text x="216" y="299" textAnchor="middle" style={{ fill: "url(#leak-final-animation-shine)" }}>Press &amp; hold to end pumping</text>
+      </g>
+    </svg>
+  </div>;
+}
+
 function LeakStepDots({ active }: { active: number }) {
   const positions = [[183, 49], [205, 46], [227, 46], [249, 49]];
   return <g className="leak-step-dots" aria-label={`漏气排查第 ${active + 1} 步`}>
@@ -272,15 +294,6 @@ function PumpScreenSvg({
           <animate attributeName="x1" values="-5%;110%;110%;-5%;-5%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
           <animate attributeName="x2" values="45%;160%;160%;45%;45%" keyTimes="0;.68;.76;.84;1" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
-        <linearGradient id="seal-passed-shine-gradient" gradientUnits="userSpaceOnUse" x1="105" y1="0" x2="165" y2="0">
-          <stop stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" />
-          <stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".42" />
-          <stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" />
-          <stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
-          <animate attributeName="x1" values="105;278" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
-          <animate attributeName="x2" values="165;338" begin="0s" dur="2s" repeatCount="1" fill="freeze" />
-        </linearGradient>
         <linearGradient id="final-shared-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor={modeShineColors[mode]} stopOpacity="0" /><stop offset=".25" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset=".5" stopColor={modeShineColors[mode]} stopOpacity=".58" /><stop offset=".75" stopColor={modeShineColors[mode]} stopOpacity=".18" /><stop offset="1" stopColor={modeShineColors[mode]} stopOpacity="0" />
           <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
@@ -317,8 +330,8 @@ function PumpScreenSvg({
       </g>}
 
       {isSealStatus && <g className="seal-status-hint">
-        <text x="216" y="261" textAnchor="middle" style={{ fill: modeHintColors[mode] }}>{sealHint}</text>
-        <text className={`pump-hint-shine-text${state === "sealPassed" ? " seal-passed-shine-text" : ""}`} x="216" y="261" textAnchor="middle" style={{ fill: state === "sealPassed" ? "url(#seal-passed-shine-gradient)" : "url(#hint-shine-gradient)" }}>{sealHint}</text>
+        <text x="216" y="261" textAnchor="middle" style={state === "sealPassed" ? { fill: modeShineColors[mode], opacity: .72 } : { fill: modeHintColors[mode] }}>{sealHint}</text>
+        {state === "sealChecking" && <text className="pump-hint-shine-text" x="216" y="261" textAnchor="middle" style={{ fill: "url(#hint-shine-gradient)" }}>{sealHint}</text>}
       </g>}
 
       {leakFinal && <g className="leak-final-overlay">
@@ -829,7 +842,7 @@ export default function DeviceDemo() {
             {state === "menu" && <MenuScreen index={menuIndex} showHint={pumpStatus === "idle"} />}
             {state === "modeSuccess" && <SuccessTimerArea seconds={seconds} status={pumpStatus} />}
             {state === "leakCheck" && leakStep < 3 && <LeakInspectionScreen key={`leak-step-${leakStep}`} step={leakStep} />}
-            {state === "leakCheck" && leakStep === 3 && <PumpScreenSvg key={`leak-final-${mode}`} state="paused" mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} leakFinal />}
+            {state === "leakCheck" && leakStep === 3 && <LeakFinalAnimation key={`leak-final-${mode}`} mode={mode} />}
             {(state === "home" || state === "pumping" || state === "paused" || state === "sealChecking" || state === "sealPassed") && <PumpScreenSvg key={`pump-${state}-${mode}`} state={state} mode={mode} seconds={seconds} leftLevel={leftLevel} rightLevel={rightLevel} speedLevel={speedLevel} bluetoothConnected={bluetoothConnected} />}
             {state === "level" && <div className="dynamic-level">
               {activeControl === "speed"
