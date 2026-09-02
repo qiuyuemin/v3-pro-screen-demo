@@ -418,6 +418,7 @@ export default function DeviceDemo() {
   const standbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clickLock = useRef(false);
   const pauseLongPressTriggered = useRef(false);
+  const pausePointerTracking = useRef(false);
   const suppressPauseClick = useRef(false);
   const wheelAccumulator = useRef(0);
   const wheelGestureLocked = useRef(false);
@@ -744,7 +745,8 @@ export default function DeviceDemo() {
   }, [beginTransitionHold, leakStep, pumpStatus, startPowerOn, state, stopHold]);
 
   const beginPauseButtonHold = useCallback(() => {
-    if (state !== "leakCheck" || leakStep !== 3) return;
+    if (pumpStatus === "idle" || state === "endingPump" || state === "poweringOff") return;
+    pausePointerTracking.current = true;
     pauseLongPressTriggered.current = false;
     suppressPauseClick.current = false;
     holdStart.current = Date.now();
@@ -757,29 +759,30 @@ export default function DeviceDemo() {
       suppressPauseClick.current = true;
       beginTransitionHold("finish");
     }, 40);
-  }, [beginTransitionHold, leakStep, state]);
+  }, [beginTransitionHold, pumpStatus, state]);
 
   const finishPauseButtonHold = useCallback((resumeOnShortPress: boolean) => {
+    if (!pausePointerTracking.current) return;
+    pausePointerTracking.current = false;
     if (holdTimer.current) clearInterval(holdTimer.current);
     holdTimer.current = null;
     const wasLongPress = pauseLongPressTriggered.current;
     suppressPauseClick.current = true;
     if (wasLongPress) {
       stopHold();
-    } else if (resumeOnShortPress && state === "leakCheck" && leakStep === 3) {
+    } else if (resumeOnShortPress) {
       handlePauseButton();
     }
     setTimeout(() => {
       suppressPauseClick.current = false;
       pauseLongPressTriggered.current = false;
     }, 250);
-  }, [handlePauseButton, leakStep, state, stopHold]);
+  }, [handlePauseButton, stopHold]);
 
   const handlePauseControlClick = useCallback(() => {
     if (suppressPauseClick.current) return;
-    if (state === "leakCheck" && leakStep === 3) return;
     handlePauseButton();
-  }, [handlePauseButton, leakStep, state]);
+  }, [handlePauseButton]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
