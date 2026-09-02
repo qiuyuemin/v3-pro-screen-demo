@@ -126,7 +126,7 @@ function LeakFinalAnimation() {
           <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
-      <rect x="78" y="307" width="276" height="64" fill="#000" />
+      <rect x="56" y="278" width="320" height="96" fill="#000" />
       <g className="leak-final-animation-copy">
         <text x="216" y="326" textAnchor="middle" fill="#929292">Press to resume</text>
         <text x="216" y="352" textAnchor="middle" fill="#929292">Press &amp; hold to end pumping</text>
