@@ -126,9 +126,12 @@ function LeakFinalAnimation() {
           <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
+      <rect x="78" y="307" width="276" height="64" fill="#000" />
       <g className="leak-final-animation-copy">
-        <text x="216" y="334" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
-        <text x="216" y="357" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
+        <text x="216" y="326" textAnchor="middle" fill="#929292">Press to resume</text>
+        <text x="216" y="352" textAnchor="middle" fill="#929292">Press &amp; hold to end pumping</text>
+        <text x="216" y="326" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
+        <text x="216" y="352" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
       </g>
     </svg>
   </SeamlessLeakVideo>;
