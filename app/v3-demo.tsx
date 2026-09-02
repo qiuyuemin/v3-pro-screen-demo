@@ -523,13 +523,19 @@ export default function DeviceDemo() {
 
   const handlePauseButton = useCallback(() => {
     if (state === "leakCheck") {
+      if (leakStep < 3) {
+        const nextStep = leakStep + 1;
+        setLeakStep(nextStep);
+        setToast(`严重漏气 ${nextStep + 1}`);
+        return;
+      }
       setPumpStatus("running");
       setState("pumping");
       setToast("漏气排查已暂停，继续吸奶");
       return;
     }
     togglePump();
-  }, [state, togglePump]);
+  }, [leakStep, state, togglePump]);
 
   const triggerSevereLeak = useCallback(() => {
     if (pumpStatus !== "running") { setToast("严重漏气检测仅可在吸奶中触发"); return; }
@@ -746,6 +752,7 @@ export default function DeviceDemo() {
 
   const beginPauseButtonHold = useCallback(() => {
     if (pumpStatus === "idle" || state === "endingPump" || state === "poweringOff") return;
+    if (state === "leakCheck" && leakStep < 3) return;
     pausePointerTracking.current = true;
     pauseLongPressTriggered.current = false;
     suppressPauseClick.current = false;
@@ -759,7 +766,7 @@ export default function DeviceDemo() {
       suppressPauseClick.current = true;
       beginTransitionHold("finish");
     }, 40);
-  }, [beginTransitionHold, pumpStatus, state]);
+  }, [beginTransitionHold, leakStep, pumpStatus, state]);
 
   const finishPauseButtonHold = useCallback((resumeOnShortPress: boolean) => {
     if (!pausePointerTracking.current) return;
