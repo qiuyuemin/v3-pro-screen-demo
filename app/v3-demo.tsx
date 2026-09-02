@@ -40,7 +40,12 @@ function LeakInspectionScreen({ step }: { step: number }) {
     </div>;
   }
   if (step === 1) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-2-animation-v2.mp4" holdMs={2000} label={leakPageLabels[1]} />;
-  if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v2.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork />;
+  if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v2.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork>
+    <svg className="leak-artwork-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
+      <rect x="136" y="76" width="160" height="39" fill="#000" />
+      <text x="216" y="106" textAnchor="middle">Check Fit</text>
+    </svg>
+  </SeamlessLeakVideo>;
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -122,8 +127,8 @@ function LeakFinalAnimation() {
         </linearGradient>
       </defs>
       <g className="leak-final-animation-copy">
-        <text x="216" y="360" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
-        <text x="216" y="386" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
+        <text x="216" y="334" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
+        <text x="216" y="357" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
       </g>
     </svg>
   </SeamlessLeakVideo>;
