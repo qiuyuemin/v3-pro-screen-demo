@@ -19,7 +19,7 @@ const leakPages = [
   "/assets/v3-pro/leak/step-2.svg",
   "/assets/v3-pro/leak/step-3.svg",
 ];
-const leakPageLabels = ["Check Tubing", "Check Fit", "Check Cup"];
+const leakPageLabels = ["Check Tubing", "Check Cup", "Check Fit"];
 
 function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery?: number }) {
   const batteryX = connected ? 204 : 220;
@@ -39,8 +39,8 @@ function LeakInspectionScreen({ step }: { step: number }) {
       <video src="/assets/v3-pro/leak/step-1-animation.mp4" autoPlay muted loop playsInline preload="auto" />
     </div>;
   }
-  if (step === 1) return <LeakFitAnimation />;
-  if (step === 2) return <LeakCupAnimation />;
+  if (step === 1) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-2-animation-v2.mp4" holdMs={2000} label={leakPageLabels[1]} />;
+  if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v2.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork />;
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
     <defs>
@@ -54,21 +54,28 @@ function LeakInspectionScreen({ step }: { step: number }) {
   </svg>;
 }
 
-function LeakCupAnimation() {
+function SeamlessLeakVideo({
+  src,
+  layoutSrc,
+  holdMs,
+  label,
+  artwork = false,
+  bright = false,
+  children,
+}: {
+  src: string;
+  layoutSrc?: string;
+  holdMs: number;
+  label: string;
+  artwork?: boolean;
+  bright?: boolean;
+  children?: React.ReactNode;
+}) {
   const videoRefs = [useRef<HTMLVideoElement | null>(null), useRef<HTMLVideoElement | null>(null)];
   const [activeVideo, setActiveVideo] = useState(0);
-  const middlePauseDone = useRef([false, false]);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
-
-  const pauseBrieflyInTheMiddle = (index: number) => {
-    const video = videoRefs[index].current;
-    if (!video || index !== activeVideo || middlePauseDone.current[index] || video.currentTime < 5) return;
-    middlePauseDone.current[index] = true;
-    video.pause();
-    timers.current.push(setTimeout(() => { if (index === activeVideo) void video.play(); }, 650));
-  };
 
   const crossfadeToBeginning = (index: number) => {
     if (index !== activeVideo) return;
@@ -78,85 +85,35 @@ function LeakCupAnimation() {
       const oldVideo = videoRefs[index].current;
       if (!nextVideo || !oldVideo) return;
       nextVideo.currentTime = 0;
-      middlePauseDone.current[nextIndex] = false;
       void nextVideo.play();
       setActiveVideo(nextIndex);
       timers.current.push(setTimeout(() => {
         oldVideo.pause();
         oldVideo.currentTime = 0;
-        middlePauseDone.current[index] = false;
-      }, 600));
-    }, 1000));
+      }, 700));
+    }, holdMs));
   };
 
-  return <div className="leak-cup-video-screen" role="img" aria-label={leakPageLabels[2]}>
+  return <div className={`seamless-leak-video${artwork ? " is-artwork" : " is-full-page"}${bright ? " is-bright" : ""}`} role="img" aria-label={label}>
+    {layoutSrc && <img className="seamless-leak-layout" src={layoutSrc} alt="" aria-hidden="true" />}
     {[0, 1].map((index) => <video
       key={index}
       ref={videoRefs[index]}
       className={index === activeVideo ? "is-active" : ""}
-      src="/assets/v3-pro/leak/step-3-animation.mp4"
+      src={src}
       autoPlay={index === 0}
       muted
       playsInline
       preload="auto"
-      onTimeUpdate={() => pauseBrieflyInTheMiddle(index)}
       onEnded={() => crossfadeToBeginning(index)}
     />)}
-  </div>;
-}
-
-function LeakFitAnimation() {
-  const [showCorrectFit, setShowCorrectFit] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => () => {
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-  }, []);
-
-  const showCorrectFitForTwoSeconds = () => {
-    setShowCorrectFit(true);
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    holdTimer.current = setTimeout(() => {
-      const video = videoRef.current;
-      if (!video) return;
-      const revealRestartedVideo = () => {
-        void video.play();
-        requestAnimationFrame(() => setShowCorrectFit(false));
-      };
-      video.addEventListener("seeked", revealRestartedVideo, { once: true });
-      video.currentTime = 0;
-    }, 2200);
-  };
-
-  return <div className="leak-fit-animation-screen" role="img" aria-label={leakPageLabels[1]}>
-    <svg viewBox="0 0 432 432" aria-hidden="true">
-      <circle cx="216" cy="216" r="216" fill="#000" />
-      <LeakStepDots active={1} />
-      <text x="216" y="106" textAnchor="middle" className="leak-fit-title">Check Fit</text>
-      <text x="216" y="349" textAnchor="middle" className="leak-fit-instruction">
-        <tspan x="216">Center the nipple</tspan>
-        <tspan x="216" dy="25">Seal flange firmly</tspan>
-      </text>
-    </svg>
-    <video
-      ref={videoRef}
-      src="/assets/v3-pro/leak/step-2-animation.mp4"
-      autoPlay
-      muted
-      playsInline
-      preload="auto"
-      onEnded={showCorrectFitForTwoSeconds}
-    />
-    <img className={showCorrectFit ? "is-visible" : ""} src="/assets/v3-pro/leak/step-2-correct.svg" alt="" aria-hidden="true" />
+    {children}
   </div>;
 }
 
 function LeakFinalAnimation() {
-  return <div className="leak-final-animation-screen" role="img" aria-label="严重漏气排查第 4 步">
-    <img src="/assets/v3-pro/leak/step-4-layout.svg" alt="" aria-hidden="true" />
-    <video src="/assets/v3-pro/leak/step-4-animation.mp4" autoPlay muted loop playsInline preload="auto" />
-    <svg viewBox="0 0 432 432" aria-hidden="true">
+  return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-4-animation-v2.mp4" holdMs={650} label="严重漏气排查第 4 步" bright>
+    <svg className="leak-final-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
       <defs>
         <linearGradient id="leak-final-copy-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
           <stop stopColor="#fff" stopOpacity="0" /><stop offset=".25" stopColor="#fff" stopOpacity=".18" /><stop offset=".5" stopColor="#fff" stopOpacity=".58" /><stop offset=".75" stopColor="#fff" stopOpacity=".18" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
@@ -164,15 +121,12 @@ function LeakFinalAnimation() {
           <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
-      <rect x="40" y="294" width="352" height="58" fill="#000" />
       <g className="leak-final-animation-copy">
-        <text x="216" y="313" textAnchor="middle" fill="#929292">Press to resume</text>
-        <text x="216" y="339" textAnchor="middle" fill="#929292">Press &amp; hold to end pumping</text>
-        <text x="216" y="313" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
-        <text x="216" y="339" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
+        <text x="216" y="360" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
+        <text x="216" y="386" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
       </g>
     </svg>
-  </div>;
+  </SeamlessLeakVideo>;
 }
 
 function LeakStepDots({ active }: { active: number }) {
