@@ -417,6 +417,8 @@ export default function DeviceDemo() {
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const standbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clickLock = useRef(false);
+  const pauseLongPressTriggered = useRef(false);
+  const suppressPauseClick = useRef(false);
   const wheelAccumulator = useRef(0);
   const wheelGestureLocked = useRef(false);
   const wheelGestureEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -640,8 +642,8 @@ export default function DeviceDemo() {
     if (state === "standby") { wake(); return; }
     if (state === "level") { confirmLevel(false); return; }
     if (state === "leakCheck") {
+      if (leakStep === 3) return;
       if (leakStep < 3) { setToast("请使用鼠标滚轮或触控板切换漏气排查页面"); }
-      else { setPumpStatus("running"); setState("pumping"); setToast("漏气排查完成，继续吸奶"); }
       return;
     }
     if (state === "sealChecking" || state === "sealPassed") { togglePump(); return; }
@@ -713,6 +715,7 @@ export default function DeviceDemo() {
 
   const beginHold = useCallback(() => {
     if (!(["off", "powerOnPrompt", "home", "paused", "pumping", "menu", "level", "sealChecking", "sealPassed", "leakCheck"] as ScreenState[]).includes(state)) return;
+    if (state === "leakCheck" && leakStep === 3) return;
     clickLock.current = false;
     if (state !== "off" && state !== "powerOnPrompt") {
       holdStart.current = Date.now();
@@ -738,7 +741,45 @@ export default function DeviceDemo() {
         startPowerOn();
       }
     }, 40);
-  }, [beginTransitionHold, pumpStatus, startPowerOn, state, stopHold]);
+  }, [beginTransitionHold, leakStep, pumpStatus, startPowerOn, state, stopHold]);
+
+  const beginPauseButtonHold = useCallback(() => {
+    if (state !== "leakCheck" || leakStep !== 3) return;
+    pauseLongPressTriggered.current = false;
+    suppressPauseClick.current = false;
+    holdStart.current = Date.now();
+    if (holdTimer.current) clearInterval(holdTimer.current);
+    holdTimer.current = setInterval(() => {
+      if (Date.now() - holdStart.current < V3_CONFIG.longPressActivationMs) return;
+      if (holdTimer.current) clearInterval(holdTimer.current);
+      holdTimer.current = null;
+      pauseLongPressTriggered.current = true;
+      suppressPauseClick.current = true;
+      beginTransitionHold("finish");
+    }, 40);
+  }, [beginTransitionHold, leakStep, state]);
+
+  const finishPauseButtonHold = useCallback((resumeOnShortPress: boolean) => {
+    if (holdTimer.current) clearInterval(holdTimer.current);
+    holdTimer.current = null;
+    const wasLongPress = pauseLongPressTriggered.current;
+    suppressPauseClick.current = true;
+    if (wasLongPress) {
+      stopHold();
+    } else if (resumeOnShortPress && state === "leakCheck" && leakStep === 3) {
+      handlePauseButton();
+    }
+    setTimeout(() => {
+      suppressPauseClick.current = false;
+      pauseLongPressTriggered.current = false;
+    }, 250);
+  }, [handlePauseButton, leakStep, state, stopHold]);
+
+  const handlePauseControlClick = useCallback(() => {
+    if (suppressPauseClick.current) return;
+    if (state === "leakCheck" && leakStep === 3) return;
+    handlePauseButton();
+  }, [handlePauseButton, leakStep, state]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -839,7 +880,12 @@ export default function DeviceDemo() {
             {MODES.map((item) => <button key={item.id} onClick={() => showTemporary(item.id)} disabled={deviceControlsLocked} aria-label={item.label}><img className="button-art" src={`/assets/v5/device-buttons/${item.id === "stimulation" ? "Stimulate" : "Expression"}.svg`} alt={item.label} /></button>)}
             <button onClick={() => openLevel("speed")} disabled={deviceControlsLocked} aria-label="Speed"><img className="button-art" src="/assets/v5/device-buttons/Speed.svg" alt="Speed" /></button>
             <button onClick={() => openLevel("left")} disabled={deviceControlsLocked} aria-label="Left"><img className="button-art" src="/assets/v5/device-buttons/Left.svg" alt="Left" /></button>
-            <button className="pause-control-button" onClick={handlePauseButton} disabled={deviceControlsLocked && state !== "leakCheck"} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
+            <button className="pause-control-button" onClick={handlePauseControlClick}
+              onPointerDown={beginPauseButtonHold}
+              onPointerUp={() => finishPauseButtonHold(true)}
+              onPointerCancel={() => finishPauseButtonHold(false)}
+              onPointerLeave={() => finishPauseButtonHold(false)}
+              disabled={deviceControlsLocked && state !== "leakCheck"} aria-label="Start/Pause"><img className="button-art" src="/assets/v5/device-buttons/SP.svg" alt="Start/Pause" /></button>
             <button onClick={() => openLevel("right")} disabled={deviceControlsLocked} aria-label="Right"><img className="button-art" src="/assets/v5/device-buttons/Right.svg" alt="Right" /></button>
           </div>
         </div>
