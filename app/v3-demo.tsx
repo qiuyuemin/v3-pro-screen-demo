@@ -37,14 +37,14 @@ function LeakInspectionScreen({ step }: { step: number }) {
   if (step === 0) {
     return <div className="leak-workflow-video-screen" role="img" aria-label={leakPageLabels[step]}>
       <video src="/assets/v3-pro/leak/step-1-animation.mp4" autoPlay muted loop playsInline preload="auto" />
+      <LeakPageChrome active={step} title={leakPageLabels[step]} />
     </div>;
   }
-  if (step === 1) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-2-animation-v2.mp4" holdMs={2000} label={leakPageLabels[1]} />;
+  if (step === 1) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-2-animation-v2.mp4" holdMs={2000} label={leakPageLabels[1]}>
+    <LeakPageChrome active={step} title={leakPageLabels[step]} />
+  </SeamlessLeakVideo>;
   if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v3.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork>
-    <svg className="leak-artwork-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
-      <rect x="136" y="76" width="160" height="39" fill="#000" />
-      <text x="216" y="106" textAnchor="middle">Check Fit</text>
-    </svg>
+    <LeakPageChrome active={step} title={leakPageLabels[step]} />
   </SeamlessLeakVideo>;
   const source = leakPages[Math.min(step, leakPages.length - 1)];
   return <svg className="leak-workflow-screen" viewBox="0 0 432 432" role="img" aria-label={leakPageLabels[step]}>
@@ -118,6 +118,7 @@ function SeamlessLeakVideo({
 
 function LeakFinalAnimation() {
   return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-4-animation-v3.mp4" layoutSrc="/assets/v3-pro/leak/step-4-layout-v3.svg" holdMs={650} label="Self-Check Complete" artwork bright>
+    <LeakPageChrome active={3} title="Self-Check Complete" />
     <svg className="leak-final-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
       <defs>
         <linearGradient id="leak-final-copy-shine" gradientUnits="userSpaceOnUse" x1="108" y1="0" x2="168" y2="0">
@@ -135,6 +136,14 @@ function LeakFinalAnimation() {
       </g>
     </svg>
   </SeamlessLeakVideo>;
+}
+
+function LeakPageChrome({ active, title }: { active: number; title: string }) {
+  return <svg className="leak-page-chrome" viewBox="0 0 432 432" aria-hidden="true">
+    <rect x="80" y="34" width="272" height="92" fill="#000" />
+    <LeakStepDots active={active} />
+    <text className="leak-page-title" x="216" y="106" textAnchor="middle">{title}</text>
+  </svg>;
 }
 
 function LeakStepDots({ active }: { active: number }) {
