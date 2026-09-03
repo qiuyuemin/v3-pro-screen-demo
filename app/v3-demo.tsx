@@ -19,7 +19,7 @@ const leakPages = [
   "/assets/v3-pro/leak/step-2.svg",
   "/assets/v3-pro/leak/step-3.svg",
 ];
-const leakPageLabels = ["Check Tubing", "Check Cup", "Check Fit"];
+const leakPageLabels = ["Air Seal Needs\nAttention", "Check Cup", "Check Fit"];
 
 function HeaderStatus({ connected, battery = 80 }: { connected: boolean; battery?: number }) {
   const batteryX = connected ? 204 : 220;
@@ -139,10 +139,14 @@ function LeakFinalAnimation() {
 }
 
 function LeakPageChrome({ active, title }: { active: number; title: string }) {
+  const titleLines = title.split("\n");
+  const isTwoLineTitle = titleLines.length > 1;
   return <svg className="leak-page-chrome" viewBox="0 0 432 432" aria-hidden="true">
-    <rect x="80" y="34" width="272" height="92" fill="#000" />
+    <rect x="80" y="34" width="272" height={isTwoLineTitle ? 118 : 92} fill="#000" />
     <LeakStepDots active={active} />
-    <text className="leak-page-title" x="216" y="106" textAnchor="middle">{title}</text>
+    <text className="leak-page-title" x="216" y={isTwoLineTitle ? 106 : 106} textAnchor="middle">
+      {titleLines.map((line, index) => <tspan key={line} x="216" dy={index === 0 ? 0 : 31}>{line}</tspan>)}
+    </text>
   </svg>;
 }
 
