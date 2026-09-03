@@ -40,7 +40,7 @@ function LeakInspectionScreen({ step }: { step: number }) {
     </div>;
   }
   if (step === 1) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-2-animation-v2.mp4" holdMs={2000} label={leakPageLabels[1]} />;
-  if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v2.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork>
+  if (step === 2) return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-3-animation-v3.mp4" layoutSrc="/assets/v3-pro/leak/step-3-layout-v2.svg" holdMs={2000} label={leakPageLabels[2]} artwork>
     <svg className="leak-artwork-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
       <rect x="136" y="76" width="160" height="39" fill="#000" />
       <text x="216" y="106" textAnchor="middle">Check Fit</text>
@@ -117,21 +117,21 @@ function SeamlessLeakVideo({
 }
 
 function LeakFinalAnimation() {
-  return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-4-animation-v2.mp4" holdMs={650} label="严重漏气排查第 4 步" bright>
+  return <SeamlessLeakVideo src="/assets/v3-pro/leak/step-4-animation-v3.mp4" layoutSrc="/assets/v3-pro/leak/step-4-layout-v3.svg" holdMs={650} label="Self-Check Complete" artwork bright>
     <svg className="leak-final-copy-overlay" viewBox="0 0 432 432" aria-hidden="true">
       <defs>
-        <linearGradient id="leak-final-copy-shine" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="165" y2="0">
-          <stop stopColor="#fff" stopOpacity="0" /><stop offset=".25" stopColor="#fff" stopOpacity=".18" /><stop offset=".5" stopColor="#fff" stopOpacity=".58" /><stop offset=".75" stopColor="#fff" stopOpacity=".18" /><stop offset="1" stopColor="#fff" stopOpacity="0" />
-          <animate attributeName="x1" values="0;370" dur="3.6s" repeatCount="indefinite" />
-          <animate attributeName="x2" values="165;535" dur="3.6s" repeatCount="indefinite" />
+        <linearGradient id="leak-final-copy-shine" gradientUnits="userSpaceOnUse" x1="108" y1="0" x2="168" y2="0">
+          <stop stopColor="#fff" stopOpacity="0" />
+          <stop offset=".5" stopColor="#fff" stopOpacity=".72" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          <animate attributeName="x1" values="108;264" dur="3.6s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="168;324" dur="3.6s" repeatCount="indefinite" />
         </linearGradient>
       </defs>
-      <rect x="56" y="278" width="320" height="96" fill="#000" />
+      <rect x="130" y="345" width="172" height="31" fill="#000" />
       <g className="leak-final-animation-copy">
-        <text x="216" y="326" textAnchor="middle" fill="#929292">Press to resume</text>
-        <text x="216" y="352" textAnchor="middle" fill="#929292">Press &amp; hold to end pumping</text>
-        <text x="216" y="326" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
-        <text x="216" y="352" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press &amp; hold to end pumping</text>
+        <text x="216" y="367" textAnchor="middle" fill="#929292">Press to resume</text>
+        <text className="leak-final-shine-text" x="216" y="367" textAnchor="middle" style={{ fill: "url(#leak-final-copy-shine)" }}>Press to resume</text>
       </g>
     </svg>
   </SeamlessLeakVideo>;
