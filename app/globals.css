@@ -64,6 +64,8 @@ button { font:inherit; }
 .seamless-leak-video.is-full-page video { inset:9.259%; width:81.482%; height:81.482%; border-radius:50%; }
 .seamless-leak-video[aria-label="Check Cup"] video { transform:translateX(2.7%); }
 .seamless-leak-video.is-artwork video { left:24.306%; top:22.454%; width:51.389%; height:51.389%; }
+.seamless-leak-video[aria-label="Check Fit"] .seamless-leak-layout { z-index:0; }
+.seamless-leak-video[aria-label="Check Fit"]::after { content:""; position:absolute; z-index:1; left:74.35%; top:22.454%; width:1.5%; height:51.389%; background:#000; }
 .seamless-leak-video[aria-label="Check Fit"] video { transform:translateX(-2.48%); }
 .seamless-leak-video[aria-label="Self-Check Complete"] video { left:24.074%; top:29.398%; width:57.87%; height:57.87%; }
 .seamless-leak-video.is-bright video { filter:brightness(1.12) contrast(1.03); }
