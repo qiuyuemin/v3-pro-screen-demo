@@ -284,12 +284,12 @@ function PumpScreenSvg({
         <text className="pump-svg-time" x="216" y="226" textAnchor="middle">{formatTime(seconds)}</text>
       </>}
 
-      {state === "sealChecking" && <foreignObject x="171" y="140" width="90" height="90" aria-label="Checking seal loading">
+      {state === "sealChecking" && <foreignObject x="171" y="151" width="90" height="90" aria-label="Checking seal loading">
         <div className="seal-loading-indicator"><span /></div>
       </foreignObject>}
       {state === "sealPassed" && <g className="seal-passed-icon" aria-label="Seal check passed">
-        <circle className="seal-passed-icon-bg" cx="216" cy="185" r="33" />
-        <path className="seal-passed-icon-check" d="M201.795 190.058C201.795 190.058 204.839 190.058 208.898 197.161C208.898 197.161 220.178 178.559 230.205 174.839" />
+        <circle className="seal-passed-icon-bg" cx="216" cy="196" r="33" />
+        <path className="seal-passed-icon-check" d="M201.795 201.058C201.795 201.058 204.839 201.058 208.898 208.161C208.898 208.161 220.178 189.559 230.205 185.839" />
       </g>}
 
       {isSealStatus && <g className="seal-status-hint">
