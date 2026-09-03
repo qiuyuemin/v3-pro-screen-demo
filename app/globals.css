@@ -29,7 +29,7 @@ button { font:inherit; }
 .solution-switch button.active { color:#161616; background:white; box-shadow:0 3px 12px #00000015; }
 .solution-switch small { margin-left:5px; color:#aaa; font-size:9px; }
 .workspace { min-height:100vh; display:grid; place-items:center; padding:86px 24px 170px; }
-.device-wrap { position:relative; width:min(1120px,93vw); aspect-ratio:1665/1195; filter:drop-shadow(0 34px 35px #554c4522); }
+.device-wrap { position:relative; width:min(1120px,93vw,calc((100vh - 256px) * 1.3933)); aspect-ratio:1665/1195; filter:drop-shadow(0 34px 35px #554c4522); }
 .device-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; }
 .round-screen { position:absolute; left:20.6%; top:31.25%; width:25.65%; aspect-ratio:1; border-radius:50%; overflow:hidden; background:#050505; cursor:pointer; touch-action:none; box-shadow:inset 0 0 0 2px #ffffff1a; outline:none; font-family:"Aeonik Soft Pro","Avenir Next","V3 Geist","Segoe UI",Arial,sans-serif; }
 .round-screen:focus-visible { box-shadow:0 0 0 4px #5c92ff80; }
